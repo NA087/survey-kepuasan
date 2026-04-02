@@ -203,24 +203,6 @@ fetch("https://script.google.com/macros/s/AKfycbwz-qE6tf0DTJJlhwM9Qz7BlTCTGK4o84
   setTimeout(() => errorToast.classList.add('hidden'), 4000);
   resetButton();
 });
-      })
-      .then(res => res.json())
-      .then(res => {
-        if (res.status === "success") {
-          form.reset();
-          successToast.classList.remove('hidden');
-          setTimeout(() => successToast.classList.add('hidden'), 4000);
-        } else {
-          throw new Error(res.message);
-        }
-        resetButton();
-      })
-      .catch(err => {
-        console.error('Submit error:', err);
-        errorToast.classList.remove('hidden');
-        setTimeout(() => errorToast.classList.add('hidden'), 4000);
-        resetButton();
-      });
 });
     function resetButton() {
       submitBtn.disabled = false;
