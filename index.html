@@ -167,17 +167,26 @@
         let isKurang = kepuasan.value === "1";
       
         Swal.fire({
-          icon: 'warning',
-          title: isKurang 
-            ? 'Anda Memilih Kurang Memuaskan' 
-            : 'Anda Memilih Cukup Memuaskan',
-          html: 'Tolong isikan kritik dan saran<br><br><b>Mohon maaf dan terima kasih</b>',
-          showConfirmButton: false,
-          timer: 3500,
-          timerProgressBar: true,
-          background: isKurang ? '#fef2f2' : '#fefce8',
-          color: isKurang ? '#991b1b' : '#854d0e'
-        });
+        title: isKurang 
+          ? 'Anda Memilih Kurang Memuaskan' 
+          : 'Anda Memilih Cukup Memuaskan',
+      
+        html: `
+          <div style="font-size:50px;">
+            ${isKurang ? '☹️' : '😐'}
+          </div>
+          <br>
+          Tolong isikan kritik dan saran
+          <br><br>
+          <b>Mohon maaf dan terima kasih</b>
+        `,
+      
+        showConfirmButton: false,
+        timer: 3500,
+        timerProgressBar: true,
+        background: isKurang ? '#fef2f2' : '#fefce8',
+        color: isKurang ? '#991b1b' : '#854d0e'
+      });
       setTimeout(() => {
   const feedbackEl = document.getElementById('feedback');
   feedbackEl.focus();
