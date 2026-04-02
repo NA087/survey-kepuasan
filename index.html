@@ -159,7 +159,32 @@
       if (!pelayanan) { aspekError.classList.remove('hidden'); valid = false; }
       if (!kepuasan) { kepuasanError.classList.remove('hidden'); valid = false; }
       if (!valid) return;
-
+      const feedback = document.getElementById('feedback').value.trim();
+      
+      // Jika pilih Cukup (2) atau Kurang (1) dan feedback kosong
+      if ((kepuasan.value === "2" || kepuasan.value === "1") && feedback === "") {
+      
+        let isKurang = kepuasan.value === "1";
+      
+        Swal.fire({
+          icon: 'warning',
+          title: isKurang 
+            ? 'Anda Memilih Kurang Memuaskan' 
+            : 'Anda Memilih Cukup Memuaskan',
+          html: 'Tolong isikan kritik dan saran<br><br><b>Mohon maaf dan terima kasih</b>',
+          showConfirmButton: false,
+          timer: 3500,
+          timerProgressBar: true,
+          background: isKurang ? '#fef2f2' : '#fefce8',
+          color: isKurang ? '#991b1b' : '#854d0e'
+        });
+      setTimeout(() => {
+  const feedbackEl = document.getElementById('feedback');
+  feedbackEl.focus();
+  feedbackEl.classList.add('border-red-400');
+}, 100);
+        return;
+      }
       // Tampilkan loading
       submitBtn.disabled = true;
       btnText.textContent = 'Mengirim...';
@@ -217,6 +242,9 @@ color: '#991b1b',
 
     // Init icons
     lucide.createIcons();
+   document.getElementById('feedback').addEventListener('input', function() {
+  this.classList.remove('border-red-400');
+});
   </script>
  </body>
 </html>
