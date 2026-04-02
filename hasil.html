@@ -29,7 +29,12 @@
 
     <div id="total" class="text-center mb-6 text-gray-600"></div>
 
-    <div id="result" class="space-y-4"></div>
+    <div id="loading" class="text-center py-10">
+  <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent mx-auto mb-3"></div>
+  <p class="text-gray-500">Memuat data...</p>
+</div>
+
+<div id="result" class="space-y-4 hidden"></div>
 
   </div>
 </div>
@@ -68,7 +73,7 @@ fetch(API_URL)
 
     // Urutkan terbesar
     result.sort((a, b) => b.jumlah - a.jumlah);
-
+    const loading = document.getElementById("loading");
     const container = document.getElementById("result");
 
     // Render HTML
@@ -108,12 +113,13 @@ fetch(API_URL)
     });
 
     container.innerHTML = html;
-
+loading.classList.add("hidden");
+container.classList.remove("hidden");
   })
-  .catch(err => {
-    document.getElementById("result").innerHTML =
-      "<p class='text-red-500 text-center'>Gagal mengambil data</p>";
-  });
+.catch(err => {
+  document.getElementById("loading").innerHTML =
+    "<p class='text-red-500'>Gagal mengambil data</p>";
+});
 
 </script>
 <style>
