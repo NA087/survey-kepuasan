@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Survey Kepuasan Pegawai</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body { font-family: sans-serif; }
+
+    label { user-select: none; }
+
+    @media (max-width: 640px) {
+      fieldset {
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+
+<div class="min-h-screen bg-blue-900 text-white text-center py-10 px-4">
+
+  <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-relaxed">
+    SURVEY KEPUASAN PEGAWAI
+  </h1>
+
+  <p class="text-sm mt-2 text-blue-200">
+    Survey ini bersifat anonim
+  </p>
+
+  <div class="bg-white text-black mt-8 mx-auto max-w-3xl p-6 rounded-xl shadow">
+
+    <form id="survey-form" class="space-y-8">
+
+      <!-- ASPEK -->
+      <fieldset>
+        <legend class="font-bold mb-2">Aspek Pelayanan</legend>
+
+        <div id="aspek-error" class="hidden text-red-500 text-sm mb-2">
+          Pilih aspek!
+        </div>
+
+        <div class="space-y-3">
+          <label><input type="radio" name="pelayanan" value="Administrasi Umum"> Administrasi Umum</label><br>
+          <label><input type="radio" name="pelayanan" value="Kepegawaian"> Kepegawaian</label><br>
+          <label><input type="radio" name="pelayanan" value="Keuangan"> Keuangan</label>
+        </div>
+      </fieldset>
+
+      <!-- KEPUASAN -->
+      <fieldset>
+        <legend class="font-bold mb-2">Tingkat Kepuasan</legend>
+
+        <div id="kepuasan-error" class="hidden text-red-500 text-sm mb-2">
+          Pilih kepuasan!
+        </div>
+
+        <div class="space-y-2">
+          <label><input type="radio" name="kepuasan" value="4"> Sangat Memuaskan</label><br>
+          <label><input type="radio" name="kepuasan" value="3"> Memuaskan</label><br>
+          <label><input type="radio" name="kepuasan" value="2"> Cukup</label><br>
+          <label><input type="radio" name="kepuasan" value="1"> Kurang</label>
+        </div>
+      </fieldset>
+
+      <!-- SARAN -->
+      <fieldset>
+        <legend class="font-bold mb-2">Saran</legend>
+        <textarea id="feedback" class="w-full border p-2" rows="4"></textarea>
+      </fieldset>
+
+      <button id="submit-btn" class="bg-blue-800 text-white px-4 py-2 rounded w-full">
+        Kirim
+      </button>
+
+    </form>
+
+    <div id="success-toast" class="hidden text-green-600 mt-4">
+      Berhasil dikirim!
+    </div>
+
+    <div id="error-toast" class="hidden text-red-600 mt-4">
+      Gagal kirim!
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const form = document.getElementById('survey-form');
+const successToast = document.getElementById('success-toast');
+const errorToast = document.getElementById('error-toast');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const pelayanan = document.querySelector('input[name="pelayanan"]:checked');
+  const kepuasan = document.querySelector('input[name="kepuasan"]:checked');
+
+  if (!pelayanan || !kepuasan) {
+    alert("Lengkapi data!");
+    return;
+  }
+
+  const data = {
+    'Aspek Pelayanan': pelayanan.value,
+    'Tingkat Kepuasan': kepuasan.value,
+    'Saran atau Kritik': document.getElementById('feedback').value
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbwil_-ocE8k8OZE6feYZILVT50c2tbwdLwkzhGXBeAcP3bRlQ49loeLZwlty2AKsxDQ2g/exec", {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    form.reset();
+    successToast.classList.remove('hidden');
+    setTimeout(() => successToast.classList.add('hidden'), 3000);
+  })
+  .catch(() => {
+    errorToast.classList.remove('hidden');
+    setTimeout(() => errorToast.classList.add('hidden'), 3000);
+  });
+
+});
+</script>
+
+</body>
+</html>
