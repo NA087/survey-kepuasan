@@ -160,13 +160,6 @@
       if (!kepuasan) { kepuasanError.classList.remove('hidden'); valid = false; }
       if (!valid) return;
 
-      // Data yang akan dikirim (Kunci disesuaikan dengan kebutuhan script)
-      const data = {
-        'Aspek Pelayanan': pelayanan.value,
-        'Tingkat Kepuasan': kepuasan.value,
-        'Saran atau Kritik': document.getElementById('feedback').value.trim().slice(0, 500)
-      };
-
       // Tampilkan loading
       submitBtn.disabled = true;
       btnText.textContent = 'Mengirim...';
