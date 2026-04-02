@@ -1,1 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hasil Survey</title>
 
+  <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class="bg-gray-100">
+
+<div class="max-w-4xl mx-auto p-6">
+
+  <h1 class="text-2xl font-bold text-center mb-6">
+    Hasil Survey Kepuasan Pegawai
+  </h1>
+
+  <div id="total" class="text-center mb-4 text-gray-600"></div>
+
+  <div id="result" class="space-y-4"></div>
+
+</div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbzXn8Sw5zosQ4BHirrm8_vR19LfQwI66PhxA8u-tyriKsCiZjKTd0GYfUs5mxMDV8XzRA/exec";
+
+// Ambil data
+fetch(API_URL)
+  .then(res => res.json())
+  .then(data => {
+
+    const counts = {};
+
+    // Hitung jumlah per aspek
+    data.forEach(row => {
+      const aspek = row["Aspek Pelayanan"];
+      if (!counts[aspek]) counts[aspek] = 0;
+      counts[aspek]++;
+    });
+
+    const total = data.length;
+
+    document.getElementById("total").innerHTML =
+      `Total Responden: <b>${total}</b>`;
+
+    // Ubah ke array + hitung persen
+    let result = Object.keys(counts).map(key => {
+      return {
+        nama: key,
+        jumlah: counts[key],
+        persen: ((counts[key] / total) * 100).toFixed(1)
+      };
+    });
+
+    // Urutkan terbesar
+    result.sort((a, b) => b.jumlah - a.jumlah);
+
+    const container = document.getElementById("result");
+
+    // Tampilkan
+    result.forEach((item, index) => {
+
+      let rankIcon = "";
+      if (index === 0) rankIcon = "🥇";
+      else if (index === 1) rankIcon = "🥈";
+      else if (index === 2) rankIcon = "🥉";
+
+      container.innerHTML += `
+        <div class="bg-white p-4 rounded-xl shadow">
+
+          <div class="flex justify-between mb-2">
+            <div class="font-semibold">
+              ${rankIcon} ${item.nama}
+            </div>
+            <div>
+              ${item.jumlah} responden (${item.persen}%)
+            </div>
+          </div>
+
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-blue-600 h-3 rounded-full"
+                 style="width: ${item.persen}%"></div>
+          </div>
+
+        </div>
+      `;
+    });
+
+  })
+  .catch(err => {
+    document.getElementById("result").innerHTML =
+      "<p class='text-red-500 text-center'>Gagal mengambil data</p>";
+  });
+
+</script>
+
+</body>
+</html>
