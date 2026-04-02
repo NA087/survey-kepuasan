@@ -5,10 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Survey Kepuasan Pegawai</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: sans-serif; }
+    html, body { height: 100%; margin: 0; }
+    body { font-family: 'Source Sans 3', sans-serif; }
+
+    .aspect-radio input:checked + label {
+      border-color: #1e3a5f;
+      background: #eef2f7;
+      box-shadow: 0 0 0 2px #1e3a5f;
+    }
+
+    .satisfaction-radio input:checked + label.sat-4 { border-color:#16a34a;background:#f0fdf4;box-shadow:0 0 0 2px #16a34a; }
+    .satisfaction-radio input:checked + label.sat-3 { border-color:#65a30d;background:#f7fee7;box-shadow:0 0 0 2px #65a30d; }
+    .satisfaction-radio input:checked + label.sat-2 { border-color:#ca8a04;background:#fefce8;box-shadow:0 0 0 2px #ca8a04; }
+    .satisfaction-radio input:checked + label.sat-1 { border-color:#dc2626;background:#fef2f2;box-shadow:0 0 0 2px #dc2626; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 0.7s linear infinite; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast-animate { animation: slideUp 0.35s ease-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.5s ease-out both; }
 
     label { user-select: none; }
 
@@ -21,75 +50,74 @@
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="h-full bg-gray-100">
 
-<div class="min-h-screen bg-blue-900 text-white text-center py-10 px-4">
+<div class="w-full min-h-full" style="background: linear-gradient(135deg,#1e3a5f,#2c5282,#1e3a5f)">
 
-  <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-relaxed">
-    SURVEY KEPUASAN PEGAWAI
-  </h1>
-
-  <p class="text-sm mt-2 text-blue-200">
-    Survey ini bersifat anonim
-  </p>
-
-  <div class="bg-white text-black mt-8 mx-auto max-w-3xl p-6 rounded-xl shadow">
-
-    <form id="survey-form" class="space-y-8">
-
-      <!-- ASPEK -->
-      <fieldset>
-        <legend class="font-bold mb-2">Aspek Pelayanan</legend>
-
-        <div id="aspek-error" class="hidden text-red-500 text-sm mb-2">
-          Pilih aspek!
-        </div>
-
-        <div class="space-y-3">
-          <label><input type="radio" name="pelayanan" value="Administrasi Umum"> Administrasi Umum</label><br>
-          <label><input type="radio" name="pelayanan" value="Kepegawaian"> Kepegawaian</label><br>
-          <label><input type="radio" name="pelayanan" value="Keuangan"> Keuangan</label>
-        </div>
-      </fieldset>
-
-      <!-- KEPUASAN -->
-      <fieldset>
-        <legend class="font-bold mb-2">Tingkat Kepuasan</legend>
-
-        <div id="kepuasan-error" class="hidden text-red-500 text-sm mb-2">
-          Pilih kepuasan!
-        </div>
-
-        <div class="space-y-2">
-          <label><input type="radio" name="kepuasan" value="4"> Sangat Memuaskan</label><br>
-          <label><input type="radio" name="kepuasan" value="3"> Memuaskan</label><br>
-          <label><input type="radio" name="kepuasan" value="2"> Cukup</label><br>
-          <label><input type="radio" name="kepuasan" value="1"> Kurang</label>
-        </div>
-      </fieldset>
-
-      <!-- SARAN -->
-      <fieldset>
-        <legend class="font-bold mb-2">Saran</legend>
-        <textarea id="feedback" class="w-full border p-2" rows="4"></textarea>
-      </fieldset>
-
-      <button id="submit-btn" class="bg-blue-800 text-white px-4 py-2 rounded w-full">
-        Kirim
-      </button>
-
-    </form>
-
-    <div id="success-toast" class="hidden text-green-600 mt-4">
-      Berhasil dikirim!
-    </div>
-
-    <div id="error-toast" class="hidden text-red-600 mt-4">
-      Gagal kirim!
-    </div>
-
+<header class="pt-10 pb-6 text-center fade-in">
+  <div class="max-w-3xl mx-auto px-4">
+    <img src="https://i.ibb.co.com/7tVffqZN/logo-hss.png" class="w-20 mx-auto mb-4">
+    <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white">
+      SURVEY KEPUASAN PEGAWAI PADA LAYANAN INTERNAL
+    </h1>
+    <p class="text-blue-300 text-sm mt-2">Survey ini bersifat anonim</p>
   </div>
+</header>
 
+<main class="px-4 pb-10">
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+
+<form id="survey-form" class="space-y-10">
+
+<!-- ASPEK -->
+<fieldset>
+<legend class="font-bold text-gray-800 mb-2">Aspek Pelayanan</legend>
+
+<div id="aspek-error" class="hidden text-red-600 text-sm mb-2">Pilih aspek!</div>
+
+<div class="space-y-3 aspect-radio">
+<label><input type="radio" name="pelayanan" value="Administrasi Umum"> Administrasi Umum</label><br>
+<label><input type="radio" name="pelayanan" value="Kepegawaian"> Kepegawaian</label><br>
+<label><input type="radio" name="pelayanan" value="Keuangan"> Keuangan</label>
+</div>
+</fieldset>
+
+<!-- KEPUASAN -->
+<fieldset>
+<legend class="font-bold text-gray-800 mb-2">Tingkat Kepuasan</legend>
+
+<div id="kepuasan-error" class="hidden text-red-600 text-sm mb-2">Pilih kepuasan!</div>
+
+<div class="space-y-2">
+<label><input type="radio" name="kepuasan" value="4"> Sangat Memuaskan</label><br>
+<label><input type="radio" name="kepuasan" value="3"> Memuaskan</label><br>
+<label><input type="radio" name="kepuasan" value="2"> Cukup</label><br>
+<label><input type="radio" name="kepuasan" value="1"> Kurang</label>
+</div>
+</fieldset>
+
+<!-- SARAN -->
+<fieldset>
+<legend class="font-bold text-gray-800 mb-2">Saran atau Kritik</legend>
+<textarea id="feedback" class="w-full border p-3 rounded"></textarea>
+</fieldset>
+
+<button id="submit-btn" class="w-full bg-blue-900 text-white py-3 rounded-lg font-bold">
+Kirim Penilaian
+</button>
+
+</form>
+
+<div id="success-toast" class="hidden text-green-600 mt-4 text-center">
+Berhasil dikirim!
+</div>
+
+<div id="error-toast" class="hidden text-red-600 mt-4 text-center">
+Gagal kirim!
+</div>
+
+</div>
+</main>
 </div>
 
 <script>
@@ -97,13 +125,13 @@ const form = document.getElementById('survey-form');
 const successToast = document.getElementById('success-toast');
 const errorToast = document.getElementById('error-toast');
 
-form.addEventListener('submit', function(e) {
+form.addEventListener('submit', function(e){
   e.preventDefault();
 
   const pelayanan = document.querySelector('input[name="pelayanan"]:checked');
   const kepuasan = document.querySelector('input[name="kepuasan"]:checked');
 
-  if (!pelayanan || !kepuasan) {
+  if(!pelayanan || !kepuasan){
     alert("Lengkapi data!");
     return;
   }
@@ -114,19 +142,17 @@ form.addEventListener('submit', function(e) {
     'Saran atau Kritik': document.getElementById('feedback').value
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbwil_-ocE8k8OZE6feYZILVT50c2tbwdLwkzhGXBeAcP3bRlQ49loeLZwlty2AKsxDQ2g/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzG4WezfDfe6RMRKoGIRjlzkatgShCkhSy3SAJOjKxz/exec", {
     method: "POST",
     mode: "no-cors",
     body: JSON.stringify(data)
   })
-  .then(() => {
+  .then(()=>{
     form.reset();
     successToast.classList.remove('hidden');
-    setTimeout(() => successToast.classList.add('hidden'), 3000);
   })
-  .catch(() => {
+  .catch(()=>{
     errorToast.classList.remove('hidden');
-    setTimeout(() => errorToast.classList.add('hidden'), 3000);
   });
 
 });
