@@ -8,7 +8,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     @keyframes fadeIn {
@@ -169,11 +169,22 @@ fetch(API_URL)
 
 // PDF
 function downloadPDF() {
-  html2canvas(document.getElementById("content")).then(canvas => {
-    const img = canvas.toDataURL("image/png");
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    pdf.addImage(img, 'PNG', 10, 10, 190, 0);
+  const element = document.getElementById("content");
+
+  html2canvas(element, { scale: 2 }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new window.jspdf.jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const pageWidth = 210;
+    const imgWidth = pageWidth - 20;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
     pdf.save("laporan-skm.pdf");
   });
 }
