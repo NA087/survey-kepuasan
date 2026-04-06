@@ -108,16 +108,28 @@ fetch(API_URL)
   document.getElementById("total").innerHTML =
     `Total Responden: <b>${penilaian.total}</b>`;
 
-  // WARNA SKM
-  let color = "bg-blue-600";
-  if (penilaian.kategori.includes("A")) color = "bg-green-600";
-  else if (penilaian.kategori.includes("B")) color = "bg-blue-600";
-  else if (penilaian.kategori.includes("C")) color = "bg-yellow-500";
-  else if (penilaian.kategori.includes("D")) color = "bg-red-600";
+// WARNA SKM DINAMIS
+const kategoriTeks = penilaian.kategori; // Mengambil "A (Sangat Baik)"
+let colorClass = "bg-blue-600"; // Default
 
-  document.getElementById("skm-card").classList.add(color);
-  document.getElementById("skm-kategori").innerText = penilaian.kategori;
+// Cek huruf pertama dari kategori (A, B, C, atau D)
+if (kategoriTeks.startsWith("A")) {
+    colorClass = "bg-green-600";
+} else if (kategoriTeks.startsWith("B")) {
+    colorClass = "bg-blue-600";
+} else if (kategoriTeks.startsWith("C")) {
+    colorClass = "bg-yellow-500";
+} else if (kategoriTeks.startsWith("D")) {
+    colorClass = "bg-red-600";
+}
 
+const skmCard = document.getElementById("skm-card");
+// Bersihkan warna lama agar tidak tumpang tindih
+skmCard.classList.remove("bg-green-600", "bg-blue-600", "bg-yellow-500", "bg-red-600");
+// Pasang warna baru
+skmCard.classList.add(colorClass);
+document.getElementById("skm-kategori").innerText = kategoriTeks;
+  
   // ANIMASI SKM
   let current = 0;
   const target = penilaian.skm;
