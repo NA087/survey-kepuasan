@@ -7,14 +7,10 @@
   <title>Hasil Survey</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
 
   <style>
-    #gaugeChart, #barChart {
-      height: 220px !important;
-    }
     @keyframes fadeIn {
       from {opacity:0; transform:translateY(10px);}
       to {opacity:1; transform:translateY(0);}
@@ -35,7 +31,7 @@
   </a>
 </div>
 
-<div class="max-w-5xl mx-auto p-6" id="content">
+<div class="max-w-4xl mx-auto p-6" id="content">
 
   <div class="bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
 
@@ -52,27 +48,8 @@
       </div>
     </div>
 
+    <!-- TOTAL -->
     <div id="total" class="text-center mb-6 text-gray-600"></div>
-
-    <!-- CHART AREA (RAPI 1 BARIS) -->
-    <div class="grid md:grid-cols-2 gap-6 items-center mb-10">
-
-      <!-- SPEEDOMETER -->
-      <div class="relative w-full max-w-sm mx-auto">
-        <canvas id="gaugeChart"></canvas>
-
-        <div class="absolute inset-0 flex flex-col items-center justify-center mt-6">
-          <div id="gauge-value" class="text-2xl font-bold"></div>
-          <div class="text-sm text-gray-500">Nilai SKM</div>
-        </div>
-      </div>
-
-      <!-- BAR CHART -->
-      <div>
-        <canvas id="barChart"></canvas>
-      </div>
-
-    </div>
 
     <!-- Loading -->
     <div id="loading" class="text-center py-10">
@@ -109,10 +86,11 @@ fetch(API_URL)
   const data = res.responses;
   const penilaian = res.penilaian;
 
+  // TOTAL
   document.getElementById("total").innerHTML =
     `Total Responden: <b>${penilaian.total}</b>`;
 
-  // warna kategori
+  // WARNA SKM
   let color = "bg-blue-600";
   if (penilaian.kategori.includes("A")) color = "bg-green-600";
   else if (penilaian.kategori.includes("B")) color = "bg-blue-600";
@@ -122,7 +100,7 @@ fetch(API_URL)
   document.getElementById("skm-card").classList.add(color);
   document.getElementById("skm-kategori").innerText = penilaian.kategori;
 
-  // animasi skm
+  // ANIMASI SKM
   let current = 0;
   const target = penilaian.skm;
   const el = document.getElementById("skm-value");
@@ -138,7 +116,7 @@ fetch(API_URL)
 
   document.getElementById("skm-box").classList.remove("hidden");
 
-  // hitung grafik
+  // HITUNG DATA
   const counts = {};
   data.forEach(row => {
     const aspek = row["Aspek Pelayanan"];
@@ -156,22 +134,25 @@ fetch(API_URL)
 
   result.sort((a, b) => b.jumlah - a.jumlah);
 
-  // list
+  // LIST
   let html = "";
   result.forEach((item, index) => {
 
     let rank = ["🥇","🥈","🥉"][index] || "";
 
     html += `
-      <div class="bg-white p-4 rounded-xl shadow">
+      <div class="bg-gray-50 p-4 rounded-xl border">
+
         <div class="flex justify-between mb-2">
           <div class="font-semibold">${rank} ${item.nama}</div>
-          <div>${item.jumlah} (${item.persen}%)</div>
+          <div>${item.jumlah} responden (${item.persen}%)</div>
         </div>
+
         <div class="w-full bg-gray-200 rounded-full h-3">
           <div class="bg-blue-600 h-3 rounded-full"
                style="width:${item.persen}%"></div>
         </div>
+
       </div>
     `;
   });
@@ -179,40 +160,6 @@ fetch(API_URL)
   document.getElementById("result").innerHTML = html;
   document.getElementById("loading").classList.add("hidden");
   document.getElementById("result").classList.remove("hidden");
-
-  // SPEEDOMETER
-  document.getElementById("gauge-value").innerText = penilaian.skm;
-
-  new Chart(document.getElementById('gaugeChart'), {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [penilaian.skm, 100 - penilaian.skm],
-        backgroundColor: ['#16a34a', '#e5e7eb'],
-        borderWidth: 0,
-        circumference: 180,
-        rotation: 270
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      cutout: '75%'
-    }
-  });
-
-  // BAR CHART
-  new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-      labels: result.map(r => r.nama),
-      datasets: [{
-        data: result.map(r => r.jumlah)
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } }
-    }
-  });
 
 })
 .catch(() => {
