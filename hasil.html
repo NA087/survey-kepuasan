@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="logo-hss.png">
-  <link rel="shortcut icon" href="logo-hss.png">
   <title>Hasil Survey</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,37 +19,91 @@
   </a>
 </div>
 
-<div class="max-w-4xl mx-auto p-6">
+<div class="max-w-5xl mx-auto p-6">
   <div class="bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
 
     <h1 class="text-2xl font-bold text-center mb-6">
-      Hasil Survey Kepuasan Pegawai Pada Layanan Internal Perangkat Daerah Kabupaten Hulu Sungai Selatan Tahun 2026
+      Hasil Survey Kepuasan Pegawai Tahun 2026
     </h1>
+
+    <!-- SKM PREMIUM -->
+    <div id="skm-box" class="mb-6 hidden">
+      <div id="skm-card" class="rounded-2xl p-6 text-center text-white shadow-lg transition-all duration-500">
+        
+        <div class="text-sm opacity-80">Nilai SKM</div>
+        
+        <div id="skm-value" class="text-5xl font-bold mt-2">0</div>
+        
+        <div id="skm-kategori" class="text-lg font-semibold mt-2"></div>
+
+      </div>
+    </div>
 
     <div id="total" class="text-center mb-6 text-gray-600"></div>
 
+    <!-- Loading -->
     <div id="loading" class="text-center py-10">
-  <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent mx-auto mb-3"></div>
-  <p class="text-gray-500">Memuat data...</p>
-</div>
+      <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent mx-auto mb-3"></div>
+      <p class="text-gray-500">Memuat data...</p>
+    </div>
 
-<div id="result" class="space-y-4 hidden"></div>
+    <!-- Result -->
+    <div id="result" class="space-y-4 hidden"></div>
 
   </div>
 </div>
-<p class="text-center text-xs text-blue-300/60 mt-6 pb-4">© 2026 Dinas Pertanian, Perikanan, dan Pangan Kabupaten Hulu Sungai Selatan</p>
+
+<p class="text-center text-xs text-blue-300/60 mt-6 pb-4">
+© 2026 Dinas Pertanian, Perikanan, dan Pangan Kabupaten Hulu Sungai Selatan
+</p>
+
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbyEjiheHtdTotKn4v9ZsaloKtfTvDWdwQSJ3JjHCfuy-Ws2vXAHCesgNJLpewNXR7Tv/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwqjL9qGOXGgO7quL4JYWpkYtyXkX0ZyuyjFD8bWMdEBHxImtM1LvxPFzZnnE7tUwoQxA/exec";
 
-// Ambil data
 fetch(API_URL)
   .then(res => res.json())
-  .then(data => {
+  .then(res => {
 
+    const data = res.responses;
+    const penilaian = res.penilaian;
+
+    // ===== TOTAL =====
+    document.getElementById("total").innerHTML =
+      `Total Responden: <b>${penilaian.total}</b>`;
+
+    // ===== WARNA KATEGORI =====
+    let color = "bg-blue-600";
+
+    if (penilaian.kategori.includes("A")) color = "bg-green-600";
+    else if (penilaian.kategori.includes("B")) color = "bg-blue-600";
+    else if (penilaian.kategori.includes("C")) color = "bg-yellow-500";
+    else if (penilaian.kategori.includes("D")) color = "bg-red-600";
+
+    const skmCard = document.getElementById("skm-card");
+    skmCard.classList.add(color);
+
+    document.getElementById("skm-kategori").innerText = penilaian.kategori;
+
+    // ===== ANIMASI ANGKA =====
+    let current = 0;
+    const target = penilaian.skm;
+    const el = document.getElementById("skm-value");
+
+    const interval = setInterval(() => {
+      current += Math.ceil(target / 30);
+      if (current >= target) {
+        current = target;
+        clearInterval(interval);
+      }
+      el.innerText = current;
+    }, 30);
+
+    document.getElementById("skm-box").classList.remove("hidden");
+
+    // ===== GRAFIK =====
     const counts = {};
 
-    // Hitung jumlah per aspek
     data.forEach(row => {
       const aspek = row["Aspek Pelayanan"];
       if (!counts[aspek]) counts[aspek] = 0;
@@ -59,10 +112,6 @@ fetch(API_URL)
 
     const total = data.length;
 
-    document.getElementById("total").innerHTML =
-      `Total Responden: <b>${total}</b>`;
-
-    // Ubah ke array + hitung persen
     let result = Object.keys(counts).map(key => {
       return {
         nama: key,
@@ -71,12 +120,11 @@ fetch(API_URL)
       };
     });
 
-    // Urutkan terbesar
     result.sort((a, b) => b.jumlah - a.jumlah);
+
     const loading = document.getElementById("loading");
     const container = document.getElementById("result");
 
-    // Render HTML
     let html = "";
 
     result.forEach((item, index) => {
@@ -85,11 +133,6 @@ fetch(API_URL)
       if (index === 0) rankIcon = "🥇";
       else if (index === 1) rankIcon = "🥈";
       else if (index === 2) rankIcon = "🥉";
-
-      let barColor = "bg-blue-600";
-      if (index === 0) barColor = "bg-green-600";
-      else if (index === 1) barColor = "bg-yellow-500";
-      else if (index === 2) barColor = "bg-orange-500";
 
       html += `
         <div class="bg-white p-4 rounded-xl shadow">
@@ -104,7 +147,7 @@ fetch(API_URL)
           </div>
 
           <div class="w-full bg-gray-200 rounded-full h-3">
-            <div class="${barColor} h-3 rounded-full"
+            <div class="bg-blue-600 h-3 rounded-full"
                  style="width: ${item.persen}%"></div>
           </div>
 
@@ -113,17 +156,19 @@ fetch(API_URL)
     });
 
     container.innerHTML = html;
-loading.classList.add("hidden");
-container.classList.remove("hidden");
+    loading.classList.add("hidden");
+    container.classList.remove("hidden");
+
   })
-.catch(err => {
+.catch(() => {
   document.getElementById("loading").innerHTML =
     "<p class='text-red-500'>Gagal mengambil data</p>";
 });
 
 </script>
+
 <style>
-  @keyframes fadeIn {
+@keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -131,5 +176,6 @@ container.classList.remove("hidden");
   animation: fadeIn 0.5s ease-out;
 }
 </style>
+
 </body>
 </html>
