@@ -7,6 +7,9 @@
   <title>Hasil Survey</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
 </head>
 
 <body class="min-h-screen" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
@@ -19,27 +22,30 @@
   </a>
 </div>
 
-<div class="max-w-5xl mx-auto p-6">
+<div class="max-w-5xl mx-auto p-6" id="content">
+
   <div class="bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
 
     <h1 class="text-2xl font-bold text-center mb-6">
       Hasil Survey Kepuasan Pegawai Tahun 2026
     </h1>
 
-    <!-- SKM PREMIUM -->
+    <!-- SKM -->
     <div id="skm-box" class="mb-6 hidden">
-      <div id="skm-card" class="rounded-2xl p-6 text-center text-white shadow-lg transition-all duration-500">
-        
+      <div id="skm-card" class="rounded-2xl p-6 text-center text-white shadow-lg">
         <div class="text-sm opacity-80">Nilai SKM</div>
-        
         <div id="skm-value" class="text-5xl font-bold mt-2">0</div>
-        
         <div id="skm-kategori" class="text-lg font-semibold mt-2"></div>
-
       </div>
     </div>
 
     <div id="total" class="text-center mb-6 text-gray-600"></div>
+
+    <!-- SPEEDOMETER -->
+    <canvas id="gaugeChart" class="mb-10"></canvas>
+
+    <!-- BAR CHART -->
+    <canvas id="barChart" class="mb-10"></canvas>
 
     <!-- Loading -->
     <div id="loading" class="text-center py-10">
@@ -47,8 +53,16 @@
       <p class="text-gray-500">Memuat data...</p>
     </div>
 
-    <!-- Result -->
+    <!-- Result List -->
     <div id="result" class="space-y-4 hidden"></div>
+
+    <!-- BUTTON PDF -->
+    <div class="text-center mt-8">
+      <button onclick="downloadPDF()" 
+        class="bg-green-600 text-white px-5 py-3 rounded-lg shadow hover:bg-green-700">
+        📄 Download PDF
+      </button>
+    </div>
 
   </div>
 </div>
@@ -62,115 +76,139 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwqjL9qGOXGgO7quL4JYWpkYtyXkX0ZyuyjFD8bWMdEBHxImtM1LvxPFzZnnE7tUwoQxA/exec";
 
 fetch(API_URL)
-  .then(res => res.json())
-  .then(res => {
+.then(res => res.json())
+.then(res => {
 
-    const data = res.responses;
-    const penilaian = res.penilaian;
+  const data = res.responses;
+  const penilaian = res.penilaian;
 
-    // ===== TOTAL =====
-    document.getElementById("total").innerHTML =
-      `Total Responden: <b>${penilaian.total}</b>`;
+  // TOTAL
+  document.getElementById("total").innerHTML =
+    `Total Responden: <b>${penilaian.total}</b>`;
 
-    // ===== WARNA KATEGORI =====
-    let color = "bg-blue-600";
+  // WARNA SKM
+  let color = "bg-blue-600";
+  if (penilaian.kategori.includes("A")) color = "bg-green-600";
+  else if (penilaian.kategori.includes("B")) color = "bg-blue-600";
+  else if (penilaian.kategori.includes("C")) color = "bg-yellow-500";
+  else if (penilaian.kategori.includes("D")) color = "bg-red-600";
 
-    if (penilaian.kategori.includes("A")) color = "bg-green-600";
-    else if (penilaian.kategori.includes("B")) color = "bg-blue-600";
-    else if (penilaian.kategori.includes("C")) color = "bg-yellow-500";
-    else if (penilaian.kategori.includes("D")) color = "bg-red-600";
+  document.getElementById("skm-card").classList.add(color);
+  document.getElementById("skm-kategori").innerText = penilaian.kategori;
 
-    const skmCard = document.getElementById("skm-card");
-    skmCard.classList.add(color);
+  // ANIMASI SKM
+  let current = 0;
+  const target = penilaian.skm;
+  const el = document.getElementById("skm-value");
 
-    document.getElementById("skm-kategori").innerText = penilaian.kategori;
+  const interval = setInterval(() => {
+    current += Math.ceil(target / 30);
+    if (current >= target) {
+      current = target;
+      clearInterval(interval);
+    }
+    el.innerText = current;
+  }, 30);
 
-    // ===== ANIMASI ANGKA =====
-    let current = 0;
-    const target = penilaian.skm;
-    const el = document.getElementById("skm-value");
+  document.getElementById("skm-box").classList.remove("hidden");
 
-    const interval = setInterval(() => {
-      current += Math.ceil(target / 30);
-      if (current >= target) {
-        current = target;
-        clearInterval(interval);
-      }
-      el.innerText = current;
-    }, 30);
+  // HITUNG DATA
+  const counts = {};
+  data.forEach(row => {
+    const aspek = row["Aspek Pelayanan"];
+    if (!counts[aspek]) counts[aspek] = 0;
+    counts[aspek]++;
+  });
 
-    document.getElementById("skm-box").classList.remove("hidden");
+  const total = data.length;
 
-    // ===== GRAFIK =====
-    const counts = {};
+  let result = Object.keys(counts).map(key => ({
+    nama: key,
+    jumlah: counts[key],
+    persen: ((counts[key] / total) * 100).toFixed(1)
+  }));
 
-    data.forEach(row => {
-      const aspek = row["Aspek Pelayanan"];
-      if (!counts[aspek]) counts[aspek] = 0;
-      counts[aspek]++;
-    });
+  result.sort((a, b) => b.jumlah - a.jumlah);
 
-    const total = data.length;
+  // LIST
+  let html = "";
+  result.forEach((item, index) => {
 
-    let result = Object.keys(counts).map(key => {
-      return {
-        nama: key,
-        jumlah: counts[key],
-        persen: ((counts[key] / total) * 100).toFixed(1)
-      };
-    });
+    let rank = ["🥇","🥈","🥉"][index] || "";
 
-    result.sort((a, b) => b.jumlah - a.jumlah);
-
-    const loading = document.getElementById("loading");
-    const container = document.getElementById("result");
-
-    let html = "";
-
-    result.forEach((item, index) => {
-
-      let rankIcon = "";
-      if (index === 0) rankIcon = "🥇";
-      else if (index === 1) rankIcon = "🥈";
-      else if (index === 2) rankIcon = "🥉";
-
-      html += `
-        <div class="bg-white p-4 rounded-xl shadow">
-
-          <div class="flex justify-between mb-2">
-            <div class="font-semibold">
-              ${rankIcon} ${item.nama}
-            </div>
-            <div>
-              ${item.jumlah} responden (${item.persen}%)
-            </div>
-          </div>
-
-          <div class="w-full bg-gray-200 rounded-full h-3">
-            <div class="bg-blue-600 h-3 rounded-full"
-                 style="width: ${item.persen}%"></div>
-          </div>
-
+    html += `
+      <div class="bg-white p-4 rounded-xl shadow">
+        <div class="flex justify-between mb-2">
+          <div class="font-semibold">${rank} ${item.nama}</div>
+          <div>${item.jumlah} (${item.persen}%)</div>
         </div>
-      `;
-    });
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="bg-blue-600 h-3 rounded-full"
+               style="width:${item.persen}%"></div>
+        </div>
+      </div>
+    `;
+  });
 
-    container.innerHTML = html;
-    loading.classList.add("hidden");
-    container.classList.remove("hidden");
+  document.getElementById("result").innerHTML = html;
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
 
-  })
+  // SPEEDOMETER
+  new Chart(document.getElementById('gaugeChart'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [penilaian.skm, 100 - penilaian.skm],
+        backgroundColor: ['#16a34a', '#e5e7eb'],
+        borderWidth: 0,
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      cutout: '70%'
+    }
+  });
+
+  // BAR CHART
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: result.map(r => r.nama),
+      datasets: [{
+        data: result.map(r => r.jumlah)
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } }
+    }
+  });
+
+})
 .catch(() => {
   document.getElementById("loading").innerHTML =
     "<p class='text-red-500'>Gagal mengambil data</p>";
 });
 
+// PDF
+function downloadPDF() {
+  html2canvas(document.getElementById("content")).then(canvas => {
+    const img = canvas.toDataURL("image/png");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    pdf.addImage(img, 'PNG', 10, 10, 190, 0);
+    pdf.save("laporan-skm.pdf");
+  });
+}
+
 </script>
 
 <style>
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
 }
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out;
