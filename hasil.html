@@ -187,28 +187,35 @@ fetch(API_URL)
 // PDF
 function downloadPDF() {
   const element = document.getElementById("content");
-  const downloadBtn = event.currentTarget; // Ambil tombol yang diklik
+  const btnDownload = event.currentTarget;
+  const btnBack = document.querySelector('a[href="index.html"]');
 
-  // 1. Sembunyikan tombol download agar tidak ikut terfoto
-  downloadBtn.style.display = "none";
+  // Sembunyikan tombol di layar asli saat proses
+  btnDownload.style.display = "none";
+  if(btnBack) btnBack.style.display = "none";
 
-  // 2. Opsi html2canvas untuk menangani masalah transparansi/animasi
   html2canvas(element, {
-    scale: 3, // 3 sudah cukup tajam dan lebih ringan dari 4
+    scale: 3,
     useCORS: true,
     backgroundColor: "#ffffff",
-    logging: false,
     onclone: (clonedDoc) => {
-      // Memaksa semua elemen di dokumen kloning agar tidak transparan
-      const animatedElements = clonedDoc.querySelectorAll('.animate-fadeIn');
-      animatedElements.forEach(el => {
+      // 1. Tampilkan KOP dan TTD di dokumen kloning (PDF)
+      clonedDoc.getElementById("pdf-header").classList.remove("hidden");
+      clonedDoc.getElementById("pdf-footer").classList.remove("hidden");
+
+      // 2. Pastikan animasi sudah selesai (Opacity 1)
+      const animated = clonedDoc.querySelectorAll('.animate-fadeIn');
+      animated.forEach(el => {
         el.style.animation = 'none';
         el.style.opacity = '1';
-        el.style.transform = 'none';
       });
+      
+      // 3. Sembunyikan tombol download di dalam PDF (jika tidak sengaja terbawa)
+      const clonedBtn = clonedDoc.querySelector('button[onclick="downloadPDF()"]');
+      if(clonedBtn) clonedBtn.style.display = "none";
     }
   }).then(canvas => {
-    const imgData = canvas.toDataURL("image/jpeg", 0.9);
+    const imgData = canvas.toDataURL("image/jpeg", 0.95);
     const pdf = new window.jspdf.jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -221,10 +228,11 @@ function downloadPDF() {
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
     pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
-    pdf.save("laporan-skm.pdf");
+    pdf.save("laporan-skm-2026.pdf");
 
-    // 3. Munculkan kembali tombol download setelah selesai
-    downloadBtn.style.display = "inline-block";
+    // Kembalikan tombol di layar asli
+    btnDownload.style.display = "inline-block";
+    if(btnBack) btnBack.style.display = "inline-block";
   });
 }
 </script>
