@@ -10,6 +10,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+
+  <style>
+    #gaugeChart, #barChart {
+      height: 220px !important;
+    }
+    @keyframes fadeIn {
+      from {opacity:0; transform:translateY(10px);}
+      to {opacity:1; transform:translateY(0);}
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
 </head>
 
 <body class="min-h-screen" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
@@ -41,11 +54,25 @@
 
     <div id="total" class="text-center mb-6 text-gray-600"></div>
 
-    <!-- SPEEDOMETER -->
-    <canvas id="gaugeChart" class="mb-10"></canvas>
+    <!-- CHART AREA (RAPI 1 BARIS) -->
+    <div class="grid md:grid-cols-2 gap-6 items-center mb-10">
 
-    <!-- BAR CHART -->
-    <canvas id="barChart" class="mb-10"></canvas>
+      <!-- SPEEDOMETER -->
+      <div class="relative w-full max-w-sm mx-auto">
+        <canvas id="gaugeChart"></canvas>
+
+        <div class="absolute inset-0 flex flex-col items-center justify-center mt-6">
+          <div id="gauge-value" class="text-2xl font-bold"></div>
+          <div class="text-sm text-gray-500">Nilai SKM</div>
+        </div>
+      </div>
+
+      <!-- BAR CHART -->
+      <div>
+        <canvas id="barChart"></canvas>
+      </div>
+
+    </div>
 
     <!-- Loading -->
     <div id="loading" class="text-center py-10">
@@ -53,10 +80,10 @@
       <p class="text-gray-500">Memuat data...</p>
     </div>
 
-    <!-- Result List -->
+    <!-- LIST -->
     <div id="result" class="space-y-4 hidden"></div>
 
-    <!-- BUTTON PDF -->
+    <!-- PDF -->
     <div class="text-center mt-8">
       <button onclick="downloadPDF()" 
         class="bg-green-600 text-white px-5 py-3 rounded-lg shadow hover:bg-green-700">
@@ -82,11 +109,10 @@ fetch(API_URL)
   const data = res.responses;
   const penilaian = res.penilaian;
 
-  // TOTAL
   document.getElementById("total").innerHTML =
     `Total Responden: <b>${penilaian.total}</b>`;
 
-  // WARNA SKM
+  // warna kategori
   let color = "bg-blue-600";
   if (penilaian.kategori.includes("A")) color = "bg-green-600";
   else if (penilaian.kategori.includes("B")) color = "bg-blue-600";
@@ -96,7 +122,7 @@ fetch(API_URL)
   document.getElementById("skm-card").classList.add(color);
   document.getElementById("skm-kategori").innerText = penilaian.kategori;
 
-  // ANIMASI SKM
+  // animasi skm
   let current = 0;
   const target = penilaian.skm;
   const el = document.getElementById("skm-value");
@@ -112,7 +138,7 @@ fetch(API_URL)
 
   document.getElementById("skm-box").classList.remove("hidden");
 
-  // HITUNG DATA
+  // hitung grafik
   const counts = {};
   data.forEach(row => {
     const aspek = row["Aspek Pelayanan"];
@@ -130,7 +156,7 @@ fetch(API_URL)
 
   result.sort((a, b) => b.jumlah - a.jumlah);
 
-  // LIST
+  // list
   let html = "";
   result.forEach((item, index) => {
 
@@ -155,6 +181,8 @@ fetch(API_URL)
   document.getElementById("result").classList.remove("hidden");
 
   // SPEEDOMETER
+  document.getElementById("gauge-value").innerText = penilaian.skm;
+
   new Chart(document.getElementById('gaugeChart'), {
     type: 'doughnut',
     data: {
@@ -168,7 +196,7 @@ fetch(API_URL)
     },
     options: {
       plugins: { legend: { display: false } },
-      cutout: '70%'
+      cutout: '75%'
     }
   });
 
@@ -204,16 +232,6 @@ function downloadPDF() {
 }
 
 </script>
-
-<style>
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
-}
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-out;
-}
-</style>
 
 </body>
 </html>
