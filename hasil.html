@@ -78,13 +78,13 @@
         <p>NIP. 197XXXXXXXXXXXXXXX</p>
       </div>
     </div>
-    <!-- PDF -->
-    <div class="text-center mt-8">
-      <button onclick="downloadPDF()" 
-        class="bg-green-600 text-white px-5 py-3 rounded-lg shadow hover:bg-green-700">
-        📄 Download PDF
-      </button>
-    </div>
+<!-- PDF -->
+<div id="download-area" class="text-center mt-8 hidden"> <!-- Tambahkan id dan class hidden -->
+  <button onclick="downloadPDF()" 
+    class="bg-green-600 text-white px-5 py-3 rounded-lg shadow hover:bg-green-700">
+    📄 Download PDF
+  </button>
+</div>
 
   </div>
 </div>
@@ -178,6 +178,7 @@ fetch(API_URL)
   document.getElementById("result").innerHTML = html;
   document.getElementById("loading").classList.add("hidden");
   document.getElementById("result").classList.remove("hidden");
+  document.getElementById("download-area").classList.remove("hidden");
 
 })
 .catch(() => {
