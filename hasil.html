@@ -167,27 +167,48 @@ fetch(API_URL)
     "<p class='text-red-500'>Gagal mengambil data</p>";
 });
 // PDF
-function downloadPDF() { 
-const element = document.getElementById("content"); 
-html2canvas(element, { 
-scale: 4, // 🔥 ini kunci biar tajam 
-useCORS: true, 
-backgroundColor: "#ffffff" 
-}).then(canvas => { 
-const imgData = canvas.toDataURL("image/jpeg", 1.0); // kualitas max 
-const pdf = new window.jspdf.jsPDF({ 
-orientation: "portrait", 
-unit: "mm", 
-format: "a4" 
-}); 
-const pageWidth = 210; 
-const margin = 10; 
-const imgWidth = pageWidth - (margin * 2); 
-const imgHeight = (canvas.height * imgWidth) / canvas.width; 
-pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight); 
-pdf.save("laporan-skm.pdf"); 
-}); 
-} 
+function downloadPDF() {
+  const element = document.getElementById("content");
+  const downloadBtn = event.currentTarget; // Ambil tombol yang diklik
+
+  // 1. Sembunyikan tombol download agar tidak ikut terfoto
+  downloadBtn.style.display = "none";
+
+  // 2. Opsi html2canvas untuk menangani masalah transparansi/animasi
+  html2canvas(element, {
+    scale: 3, // 3 sudah cukup tajam dan lebih ringan dari 4
+    useCORS: true,
+    backgroundColor: "#ffffff",
+    logging: false,
+    onclone: (clonedDoc) => {
+      // Memaksa semua elemen di dokumen kloning agar tidak transparan
+      const animatedElements = clonedDoc.querySelectorAll('.animate-fadeIn');
+      animatedElements.forEach(el => {
+        el.style.animation = 'none';
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }
+  }).then(canvas => {
+    const imgData = canvas.toDataURL("image/jpeg", 0.9);
+    const pdf = new window.jspdf.jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const pageWidth = 210;
+    const margin = 10;
+    const imgWidth = pageWidth - (margin * 2);
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
+    pdf.save("laporan-skm.pdf");
+
+    // 3. Munculkan kembali tombol download setelah selesai
+    downloadBtn.style.display = "inline-block";
+  });
+}
 </script>
 </body>
 </html>
