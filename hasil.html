@@ -38,11 +38,11 @@
   <div class="max-w-4xl mx-auto p-4 md:p-6" id="content">
     <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-10">
       
-      <div id="pdf-header-img" class="hidden mb-6">
+      <div id="pdf-header-img" class="hidden mb-2">
         <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
-      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
+      <h1 class="text-2xl font-extrabold text-center mb-4 text-gray-800">aHasil Survey Kepuasan Pegawai</h1>
 
       <!-- LOADING AREA -->
       <div id="loading" class="text-center py-20">
@@ -54,8 +54,8 @@
       <div id="data-container" class="hidden">
         
         <!-- Skor Indeks (SKM) -->
-        <div id="skm-box" class="mb-10">
-          <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg">
+        <div id="skm-box" class="mb-4">
+          <div id="skm-card" class="rounded-2xl p-6 text-center text-white shadow-lg">
             <div class="text-sm opacity-90 uppercase tracking-widest font-semibold">Indeks Kepuasan</div>
             <div id="skm-value" class="text-7xl font-black my-2">0</div>
             <div id="skm-kategori" class="text-xl font-bold"></div>
@@ -158,6 +158,11 @@
       const { jsPDF } = window.jspdf;
       const originalContent = document.getElementById('content');
       const tempClone = originalContent.cloneNode(true);
+      const skmBox = tempClone.querySelector('#skm-box');
+        if (skmBox) {
+          skmBox.style.marginTop = "5px";
+          skmBox.style.marginBottom = "10px";
+        }
       
       Object.assign(tempClone.style, {
         position: "absolute", left: "-9999px", top: "0",
@@ -193,6 +198,9 @@ if (skmValue) {
   skmValue.style.margin = "2px 0";
 }
       const pdfHeader = tempClone.querySelector('#pdf-header-img');
+      if (pdfHeader) {
+  pdfHeader.style.marginBottom = "5px";
+}
       const pdfFooter = tempClone.querySelector('#pdf-footer');
       const downloadBtn = tempClone.querySelector('#download-area');
 
