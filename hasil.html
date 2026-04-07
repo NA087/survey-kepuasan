@@ -35,8 +35,8 @@
   <div class="max-w-4xl mx-auto p-4 md:p-6" id="content">
     <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-10">
       
-      <!-- Kop Surat: Hanya muncul di PDF -->
-      <div id="pdf-header-img" class="hidden mb-6 pb-2">
+      <!-- Kop Surat: Garis dihapus karena sudah ada di gambar PNG -->
+      <div id="pdf-header-img" class="hidden mb-6">
         <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
@@ -62,8 +62,8 @@
       <!-- Container Hasil -->
       <div id="result" class="space-y-5 hidden"></div>
 
-      <!-- Footer Khusus PDF -->
-      <div id="pdf-footer" class="hidden mt-16 grid grid-cols-2 gap-4 text-center text-sm pt-10 border-t border-gray-200">
+      <!-- Footer Khusus PDF: Garis border-t dihapus -->
+      <div id="pdf-footer" class="hidden mt-16 grid grid-cols-2 gap-4 text-center text-sm pt-10">
         <div>Mengetahui,<br><br><br><br><br><b>Kepala Dinas</b></div>
         <div>Kandangan, <span id="current-date"></span><br><br><br><br><br><b>Admin Sistem</b></div>
       </div>
@@ -171,7 +171,7 @@
           pdfFooter.classList.add('hidden');
           downloadBtnArea.classList.remove('hidden');
         });
-      }, 500); // Waktu tunggu agar gambar kop benar-benar tampil sebelum di-capture
+      }, 500); 
     }
 
     window.onload = muatData;
