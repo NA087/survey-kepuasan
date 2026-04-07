@@ -268,11 +268,12 @@
       // UI Loading State
       setLoading(true);
 
-      try {
+        try {
         const formData = new URLSearchParams();
+        // Pastikan nama di dalam tanda petik ini sama dengan header di Excel Anda
         formData.append('Aspek Pelayanan', pelayanan.value);
         formData.append('Tingkat Kepuasan', kepuasan.value);
-        formData.append('Saran atau Kritik', feedback);
+        formData.append('Saran atau Kritik', feedback); // Pastikan "Saran atau Kritik"
 
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
