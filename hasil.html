@@ -105,9 +105,22 @@
           document.getElementById("skm-kategori").innerText = p.kategori;
 
           const card = document.getElementById("skm-card");
-          // Warna disesuaikan: >= 81.26 Sangat Baik (Hijau)
-          card.className = "rounded-2xl p-8 text-center text-white shadow-lg " + 
-            (p.skm >= 81.26 ? "bg-green-600" : p.skm >= 62.5 ? "bg-blue-600" : "bg-red-600");
+          const kat = p.kategori.toUpperCase(); // Ambil huruf kategori (A/B/C/D)
+
+          // Logika Warna Berdasarkan Huruf Kategori
+          let warnaClass = "bg-gray-500"; // Warna default jika tidak terdeteksi
+
+          if (kat.includes("A")) {
+            warnaClass = "bg-green-600"; // A = Hijau
+          } else if (kat.includes("B")) {
+            warnaClass = "bg-blue-600";  // B = Biru
+          } else if (kat.includes("C")) {
+            warnaClass = "bg-yellow-500"; // C = Kuning
+          } else if (kat.includes("D")) {
+            warnaClass = "bg-red-600";    // D = Merah
+          }
+
+          card.className = `rounded-2xl p-8 text-center text-white shadow-lg ${warnaClass}`;
 
           let html = "";
           const counts = {};
