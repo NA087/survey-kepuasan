@@ -17,35 +17,34 @@
   <!-- Header & Filter -->
   <div class="max-w-4xl mx-auto px-6 pt-8 pb-4 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-3">
-      <select id="filter-bulan" class="p-2 rounded-lg border border-blue-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+      <select id="filter-bulan" class="p-2 rounded-lg border border-blue-300 text-sm outline-none">
         <option value="">Semua Bulan</option>
         <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option><option value="04">April</option>
         <option value="05">Mei</option><option value="06">Juni</option><option value="07">Juli</option><option value="08">Agustus</option>
         <option value="09">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
       </select>
-      <select id="filter-tahun" class="p-2 rounded-lg border border-blue-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+      <select id="filter-tahun" class="p-2 rounded-lg border border-blue-300 text-sm outline-none">
         <option value="2026">2026</option><option value="2025">2025</option>
       </select>
-      <button onclick="muatData()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md transition-all">🔍 Filter</button>
+      <button onclick="muatData()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md">🔍 Filter</button>
     </div>
-    <a href="index.html" class="bg-white text-blue-600 border border-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors">⬅ Kembali</a>
+    <a href="index.html" class="bg-white text-blue-600 border border-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-blue-50">⬅ Kembali</a>
   </div>
 
   <!-- Konten Laporan -->
   <div class="max-w-4xl mx-auto p-4 md:p-6" id="content">
     <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-10">
       
-      <!-- Header Khusus PDF -->
-      <div id="pdf-header" class="hidden mb-8 text-center border-b-2 border-gray-800 pb-4">
-        <h2 class="text-xl font-bold uppercase">Laporan Kepuasan Layanan Internal</h2>
-        <p class="text-sm">Dinas Pertanian, Perikanan, dan Pangan Kabupaten Hulu Sungai Selatan</p>
+      <!-- Kop Surat: Hanya muncul di PDF -->
+      <div id="pdf-header-img" class="hidden mb-6 border-b-4 border-black pb-2">
+        <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
       <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
 
       <!-- Skor Indeks (SKM) -->
       <div id="skm-box" class="hidden mb-10">
-        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg transition-colors duration-500">
+        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg">
           <div class="text-sm opacity-90 uppercase tracking-widest font-semibold">Indeks Kepuasan</div>
           <div id="skm-value" class="text-7xl font-black my-2">0</div>
           <div id="skm-kategori" class="text-xl font-bold"></div>
@@ -57,7 +56,7 @@
       <!-- Loading State -->
       <div id="loading" class="text-center py-20">
         <div class="spinner mb-4"></div>
-        <p class="text-blue-900 font-medium animate-pulse">Mengambil data dari server...</p>
+        <p class="text-blue-900 font-medium animate-pulse">Mengambil data...</p>
       </div>
 
       <!-- Container Hasil -->
@@ -66,12 +65,12 @@
       <!-- Footer Khusus PDF -->
       <div id="pdf-footer" class="hidden mt-16 grid grid-cols-2 gap-4 text-center text-sm pt-10 border-t border-gray-200">
         <div>Mengetahui,<br><br><br><br><br><b>Kepala Dinas</b></div>
-        <div>Kandangan, <span id="current-date">2026</span><br><br><br><br><br><b>Admin Sistem</b></div>
+        <div>Kandangan, <span id="current-date"></span><br><br><br><br><br><b>Admin Sistem</b></div>
       </div>
 
       <!-- Tombol Aksi -->
       <div id="download-area" class="text-center mt-12 hidden">
-        <button onclick="downloadPDF()" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-green-700 hover:scale-105 transition-all flex items-center gap-2 mx-auto">
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-green-700 hover:scale-105 transition-all mx-auto flex items-center justify-center gap-2">
           📄 Download Laporan PDF
         </button>
       </div>
@@ -79,11 +78,9 @@
   </div>
 
   <script>
-    // Pastikan URL diawali dengan https://script.google.com/macros/s/
     const API_BASE_URL = "https://script.google.com/macros/s/AKfycbzg0Sc34wbc1ylDflmSoxSJxvhjHxvBG-6zlu5AQCRw6KoOYR9gdZmfj16XQngumhrtQQ/exec";
 
     function muatData() {
-      // UI Reset
       document.getElementById("loading").classList.remove("hidden");
       document.getElementById("result").classList.add("hidden");
       document.getElementById("skm-box").classList.add("hidden");
@@ -99,17 +96,14 @@
           const data = res.responses || [];
           const p = res.penilaian || { total: 0, skm: 0, kategori: "N/A" };
 
-          // Update SKM
           document.getElementById("total").innerHTML = `Total: ${p.total} Responden`;
           document.getElementById("skm-value").innerText = p.skm.toFixed(2);
           document.getElementById("skm-kategori").innerText = p.kategori;
 
-          // Update Warna Card SKM
           const card = document.getElementById("skm-card");
           card.className = "rounded-2xl p-8 text-center text-white shadow-lg " + 
             (p.skm >= 80 ? "bg-green-600" : p.skm >= 70 ? "bg-blue-600" : "bg-red-600");
 
-          // Render Grafik Sederhana
           let html = "";
           const counts = {};
           data.forEach(row => { 
@@ -117,69 +111,67 @@
             counts[key] = (counts[key] || 0) + 1; 
           });
 
-          const totalData = data.length;
           Object.keys(counts).forEach(aspek => {
-            const persen = totalData > 0 ? ((counts[aspek] / totalData) * 100).toFixed(1) : 0;
+            const persen = data.length > 0 ? ((counts[aspek] / data.length) * 100).toFixed(1) : 0;
             html += `
-              <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+              <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
                 <div class="flex justify-between font-bold text-gray-700 text-sm mb-3">
-                  <span class="max-w-[70%]">${aspek}</span>
+                  <span>${aspek}</span>
                   <span class="text-blue-600">${counts[aspek]} Pegawai</span>
                 </div>
                 <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
-                  <div class="bg-blue-500 h-full rounded-full transition-all duration-1000" style="width:${persen}%"></div>
+                  <div class="bg-blue-500 h-full rounded-full" style="width:${persen}%"></div>
                 </div>
-                <div class="text-right text-[10px] text-gray-400 mt-1">${persen}% dari total aspek terpilih</div>
               </div>`;
           });
 
-          document.getElementById("result").innerHTML = html || "<p class='text-center text-gray-400 py-10'>Tidak ada data ditemukan untuk periode ini.</p>";
-          
-          // Show Content
+          document.getElementById("result").innerHTML = html || "<p class='text-center py-10'>Tidak ada data.</p>";
           document.getElementById("loading").classList.add("hidden");
           document.getElementById("result").classList.remove("hidden");
           document.getElementById("skm-box").classList.remove("hidden");
           if(data.length > 0) document.getElementById("download-area").classList.remove("hidden");
         })
         .catch(err => {
-          console.error(err);
-          document.getElementById("loading").innerHTML = `<p class="text-red-500 font-bold">Gagal memuat data. Periksa koneksi atau URL API.</p>`;
+          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data.</p>`;
         });
     }
 
     function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const content = document.getElementById('content');
-      const downloadBtn = document.getElementById('download-area');
-      const pdfHeader = document.getElementById('pdf-header');
+      const pdfHeader = document.getElementById('pdf-header-img');
       const pdfFooter = document.getElementById('pdf-footer');
+      const downloadBtnArea = document.getElementById('download-area');
 
-      // Siapkan UI untuk Capture
+      // Tampilkan Kop dan Footer
       pdfHeader.classList.remove('hidden');
       pdfFooter.classList.remove('hidden');
-      downloadBtn.classList.add('hidden');
-      document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-      html2canvas(content, {
-        scale: 2, // Kualitas gambar lebih tajam
-        useCORS: true,
-        backgroundColor: "#ffffff"
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        // Tambahkan Gambar ke PDF (margin 0)
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`Laporan_Survey_${new Date().getTime()}.pdf`);
-
-        // Kembalikan UI semula
-        pdfHeader.classList.add('hidden');
-        pdfFooter.classList.add('hidden');
-        downloadBtn.classList.remove('hidden');
+      downloadBtnArea.classList.add('hidden');
+      
+      document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { 
+        day: 'numeric', month: 'long', year: 'numeric' 
       });
+
+      setTimeout(() => {
+        html2canvas(content, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: "#ffffff"
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`Laporan_Survey_${new Date().getTime()}.pdf`);
+
+          // Sembunyikan kembali setelah download
+          pdfHeader.classList.add('hidden');
+          pdfFooter.classList.add('hidden');
+          downloadBtnArea.classList.remove('hidden');
+        });
+      }, 500); // Waktu tunggu agar gambar kop benar-benar tampil sebelum di-capture
     }
 
     window.onload = muatData;
