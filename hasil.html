@@ -165,6 +165,33 @@
       });
 
       document.body.appendChild(tempClone);
+      // RAPATKAN KHUSUS PDF (AMAN)
+const container = tempClone.querySelector('.bg-white');
+if (container) {
+  container.style.paddingTop = "10px";
+  container.style.paddingBottom = "20px";
+}
+
+const header = tempClone.querySelector('#pdf-header-img');
+if (header) {
+  header.style.marginBottom = "5px";
+}
+
+const title = tempClone.querySelector('h1');
+if (title) {
+  title.style.marginBottom = "10px";
+  title.style.marginTop = "0px";
+}
+
+const skmCard = tempClone.querySelector('#skm-card');
+if (skmCard) {
+  skmCard.style.padding = "15px";
+}
+
+const skmValue = tempClone.querySelector('#skm-value');
+if (skmValue) {
+  skmValue.style.margin = "2px 0";
+}
       const pdfHeader = tempClone.querySelector('#pdf-header-img');
       const pdfFooter = tempClone.querySelector('#pdf-footer');
       const downloadBtn = tempClone.querySelector('#download-area');
