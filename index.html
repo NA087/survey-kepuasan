@@ -1,672 +1,319 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="id" class="h-full">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="logo-hss.png" />
+  <link rel="shortcut icon" href="logo-hss.png" />
+  <title>Survey Kepuasan Pegawai</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Scripts & Fonts -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
 
-    <link rel="icon" href="logo-hss.png" />
+  <style>
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      height: 100%;
+      margin: 0;
+    }
 
-    <link rel="shortcut icon" href="logo-hss.png" />
+    /* Custom Radio Styling */
+    .aspect-radio input:checked + label {
+      border-color: #1e3a5f;
+      background: #eef2f7;
+      box-shadow: 0 0 0 2px #1e3a5f;
+    }
 
-    <title>Survey Kepuasan Pegawai</title>
+    /* Satisfaction States */
+    .satisfaction-radio input:checked + label.sat-4 { border-color: #16a34a; background: #f0fdf4; box-shadow: 0 0 0 2px #16a34a; }
+    .satisfaction-radio input:checked + label.sat-3 { border-color: #65a30d; background: #f7fee7; box-shadow: 0 0 0 2px #65a30d; }
+    .satisfaction-radio input:checked + label.sat-2 { border-color: #ca8a04; background: #fefce8; box-shadow: 0 0 0 2px #ca8a04; }
+    .satisfaction-radio input:checked + label.sat-1 { border-color: #dc2626; background: #fef2f2; box-shadow: 0 0 0 2px #dc2626; }
 
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    .aspect-radio label, .satisfaction-radio label {
+      transition: all 0.2s ease;
+      user-select: none;
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    .aspect-radio label:hover, .satisfaction-radio label:hover {
+      transform: translateY(-2px);
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    /* Animations */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { animation: spin 0.7s linear infinite; }
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;display=swap"
-      rel="stylesheet"
-    />
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.5s ease-out both; }
+    .fade-in-d1 { animation-delay: 0.1s; }
+    .fade-in-d2 { animation-delay: 0.2s; }
+    .fade-in-d3 { animation-delay: 0.35s; }
 
-    <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-      }
+    @media (max-width: 640px) {
+      fieldset { padding-bottom: 12px; border-bottom: 1px solid #e5e7eb; }
+    }
+  </style>
+</head>
 
-      body {
-        font-family: 'Source Sans 3', sans-serif;
-      }
-
-      /* Custom radio styling */
-
-      .aspect-radio input:checked + label {
-        border-color: #1e3a5f;
-
-        background: #eef2f7;
-
-        box-shadow: 0 0 0 2px #1e3a5f;
-      }
-
-      .satisfaction-radio input:checked + label.sat-4 {
-        border-color: #16a34a;
-        background: #f0fdf4;
-        box-shadow: 0 0 0 2px #16a34a;
-      }
-
-      .satisfaction-radio input:checked + label.sat-3 {
-        border-color: #65a30d;
-        background: #f7fee7;
-        box-shadow: 0 0 0 2px #65a30d;
-      }
-
-      .satisfaction-radio input:checked + label.sat-2 {
-        border-color: #ca8a04;
-        background: #fefce8;
-        box-shadow: 0 0 0 2px #ca8a04;
-      }
-
-      .satisfaction-radio input:checked + label.sat-1 {
-        border-color: #dc2626;
-        background: #fef2f2;
-        box-shadow: 0 0 0 2px #dc2626;
-      }
-
-      .satisfaction-radio label {
-        transition: all 0.15s ease;
-      }
-
-      .aspect-radio label {
-        transition: all 0.15s ease;
-      }
-
-      /* Loading spinner */
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .spinner {
-        animation: spin 0.7s linear infinite;
-      }
-
-      /* Success toast slide in */
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .toast-animate {
-        animation: slideUp 0.35s ease-out;
-      }
-
-      label {
-        user-select: none;
-      }
-
-      @media (max-width: 640px) {
-        fieldset {
-          padding-bottom: 12px;
-
-          border-bottom: 1px solid #e5e7eb;
-        }
-      }
-
-      /* Fade in form */
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(16px);
-        }
-
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .fade-in {
-        animation: fadeIn 0.5s ease-out both;
-      }
-
-      .fade-in-d1 {
-        animation-delay: 0.1s;
-      }
-
-      .fade-in-d2 {
-        animation-delay: 0.2s;
-      }
-
-      .fade-in-d3 {
-        animation-delay: 0.35s;
-      }
-
-      .aspect-radio label:hover,
-      .satisfaction-radio label:hover {
-        transform: translateY(-2px);
-      }
-    </style>
-  </head>
-
-  <body class="h-full bg-gray-100 overflow-auto">
-    <div
-      id="app-wrapper"
-      class="w-full min-h-full"
-      style="
-        background: linear-gradient(
-          135deg,
-          #1e3a5f 0%,
-          #2c5282 50%,
-          #1e3a5f 100%
-        );
-      "
-    >
-      <header class="w-full pt-10 pb-6 text-center fade-in">
-        <div class="w-full flex justify-end px-4 mb-2">
-          <a
-            href="hasil.html"
-            class="bg-white text-blue-900 text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition"
-          >
-            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Lihat Hasil
-          </a>
+<body class="h-full bg-gray-100 overflow-auto">
+  <div id="app-wrapper" class="w-full min-h-full" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
+    
+    <!-- Header -->
+    <header class="w-full pt-10 pb-6 text-center fade-in">
+      <div class="w-full flex justify-end px-4 mb-2">
+        <a href="hasil.html" class="bg-white text-blue-900 text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition flex items-center gap-2">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Lihat Hasil
+        </a>
+      </div>
+      <div class="mx-auto px-4 max-w-3xl">
+        <div class="mx-auto mb-4 w-20 h-20 flex items-center justify-center">
+          <img src="https://i.ibb.co.com/7tVffqZN/logo-hss.png" alt="Logo HSS" class="w-full h-full object-contain" loading="lazy" />
         </div>
-
-        <div class="mx-auto px-4 max-w-3xl">
-          <div class="mx-auto mb-4 w-20 h-20 flex items-center justify-center">
-            <img
-              src="https://i.ibb.co.com/7tVffqZN/logo-hss.png"
-              alt="logo hss"
-              class="w-full h-full object-contain"
-              loading="lazy"
-            />
-          </div>
-
-          <h1
-            id="main-title"
-            class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white leading-relaxed px-4"
-          >
-            SURVEY KEPUASAN PEGAWAI PADA LAYANAN INTERNAL PERANGKAT DAERAH DINAS
-            PERTANIAN, PERIKANAN, DAN PANGAN KABUPATEN HULU SUNGAI SELATAN TAHUN
-            2026
-          </h1>
-
-          <p class="mt-3 text-sm text-blue-300/80">
-            Survey ini bersifat anonim. Data digunakan untuk peningkatan
-            kualitas layanan internal.
-          </p>
-        </div>
-      </header>
-      <main class="w-full px-4 md:px-6 lg:px-8 pb-12">
-        <div
-          class="mx-auto w-full max-w-4xl md:max-w-5xl lg:max-w-6xl bg-white rounded-2xl shadow-xl overflow-hidden"
-        >
-          <form
-            id="survey-form"
-            class="p-5 md:p-8 space-y-10 md:space-y-12"
-            novalidate
-          >
-            <fieldset class="fade-in fade-in-d2">
-              <legend
-                class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2"
-              >
-                <i
-                  data-lucide="clipboard-list"
-                  class="w-5 h-5"
-                  style="color: #1e3a5f"
-                ></i>
-                Aspek Pelayanan
-              </legend>
-
-              <p class="text-sm text-gray-500 mb-4">
-                Pilih satu aspek pelayanan yang ingin Anda nilai.
-              </p>
-
-              <div
-                id="aspek-error"
-                class="hidden text-red-600 text-sm mb-2 font-semibold"
-              >
-                ⚠ Silakan pilih aspek pelayanan.
-              </div>
-
-              <div class="space-y-3 aspect-radio">
-                <div>
-                  <input
-                    type="radio"
-                    name="pelayanan"
-                    id="p1"
-                    value="Aspek Pelayanan Administrasi Umum Perangkat Daerah"
-                    class="sr-only"
-                  /><label
-                    for="p1"
-                    class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300"
-                    >Aspek Pelayanan Administrasi Umum Perangkat Daerah</label
-                  >
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    name="pelayanan"
-                    id="p2"
-                    value="Aspek Pelayanan Administrasi Kepegawaian"
-                    class="sr-only"
-                  /><label
-                    for="p2"
-                    class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300"
-                    >Aspek Pelayanan Administrasi Kepegawaian</label
-                  >
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    name="pelayanan"
-                    id="p3"
-                    value="Aspek Pelayanan Jasa Penunjang Urusan Pemerintah Daerah"
-                    class="sr-only"
-                  /><label
-                    for="p3"
-                    class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300"
-                    >Aspek Pelayanan Jasa Penunjang Urusan Pemerintah
-                    Daerah</label
-                  >
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    name="pelayanan"
-                    id="p4"
-                    value="Aspek Pelayanan Pemeliharaan Barang Milik Daerah"
-                    class="sr-only"
-                  /><label
-                    for="p4"
-                    class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300"
-                    >Aspek Pelayanan Pemeliharaan Barang Milik Daerah</label
-                  >
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    name="pelayanan"
-                    id="p5"
-                    value="Aspek Pelayanan Adminstrasi Keuangan"
-                    class="sr-only"
-                  /><label
-                    for="p5"
-                    class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300"
-                    >Aspek Pelayanan Adminstrasi Keuangan</label
-                  >
-                </div>
-
-                <div>
-                  <input
-                    type="radio"
-                    name="pelayanan"
-                    id="p6"
-                    value="Aspek Pelayanan Perencanaan"
-                    class="sr-only"
-                  /><label
-                    for="p6"
-                    class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300"
-                    >Aspek Pelayanan Perencanaan</label
-                  >
-                </div>
-              </div>
-            </fieldset>
-
-            <hr class="border-gray-200" />
-            <fieldset class="fade-in fade-in-d3">
-              <legend
-                class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2"
-              >
-                <i
-                  data-lucide="smile"
-                  class="w-5 h-5"
-                  style="color: #1e3a5f"
-                ></i>
-                Tingkat Kepuasan
-              </legend>
-
-              <p class="text-sm text-gray-500 mb-4">
-                Berikan penilaian Anda terhadap pelayanan tersebut.
-              </p>
-
-              <div
-                id="kepuasan-error"
-                class="hidden text-red-600 text-sm mb-2 font-semibold"
-              >
-                ⚠ Silakan pilih tingkat kepuasan.
-              </div>
-
-              <div
-                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 satisfaction-radio"
-              >
-                <div>
-                  <input
-                    type="radio"
-                    name="kepuasan"
-                    id="k4"
-                    value="4"
-                    class="sr-only"
-                  />
-                  <label
-                    for="k4"
-                    class="sat-4 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-green-400 text-center"
-                  >
-                    <span class="text-3xl">😀</span>
-                    <span class="text-xs font-bold text-green-700"
-                      >Sangat Memuaskan</span
-                    >
-                  </label>
-                </div>
-                <div>
-                  <input
-                    type="radio"
-                    name="kepuasan"
-                    id="k3"
-                    value="3"
-                    class="sr-only"
-                  />
-                  <label
-                    for="k3"
-                    class="sat-3 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-lime-400 text-center"
-                  >
-                    <span class="text-3xl">🙂</span>
-                    <span class="text-xs font-bold text-lime-700"
-                      >Memuaskan</span
-                    >
-                  </label>
-                </div>
-                <div>
-                  <input
-                    type="radio"
-                    name="kepuasan"
-                    id="k2"
-                    value="2"
-                    class="sr-only"
-                  />
-                  <label
-                    for="k2"
-                    class="sat-2 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-yellow-400 text-center"
-                  >
-                    <span class="text-3xl">😐</span>
-                    <span class="text-xs font-bold text-yellow-700"
-                      >Cukup Memuaskan</span
-                    >
-                  </label>
-                </div>
-                <div>
-                  <input
-                    type="radio"
-                    name="kepuasan"
-                    id="k1"
-                    value="1"
-                    class="sr-only"
-                  />
-                  <label
-                    for="k1"
-                    class="sat-1 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-red-400 text-center"
-                  >
-                    <span class="text-3xl">☹️</span>
-                    <span class="text-xs font-bold text-red-600"
-                      >Kurang Memuaskan</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </fieldset>
-
-            <hr class="border-gray-200" />
-            <fieldset class="fade-in fade-in-d3">
-              <legend
-                class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2"
-              >
-                <i
-                  data-lucide="message-square"
-                  class="w-5 h-5"
-                  style="color: #1e3a5f"
-                ></i>
-                <span id="feedback-label">Saran atau Kritik</span>
-              </legend>
-
-              <p class="text-sm text-gray-500 mb-4">
-                Bagikan saran atau kritik Anda untuk peningkatan layanan
-                (opsional).
-              </p>
-              <textarea
-                id="feedback"
-                name="feedback"
-                placeholder="Tulis saran atau kritik Anda di sini..."
-                class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
-                rows="5"
-              ></textarea>
-
-              <p class="text-xs text-gray-400 mt-2">Maks 500 karakter</p>
-            </fieldset>
-            <div class="pt-2">
-              <button
-                type="submit"
-                id="submit-btn"
-                class="w-full py-3.5 rounded-xl font-bold text-white text-base flex items-center justify-center gap-2 transition-all"
-                style="background: #1e3a5f"
-                onmouseover="this.style.background = '#2c5282'"
-                onmouseout="this.style.background = '#1e3a5f'"
-              >
-                <i data-lucide="send" class="w-5 h-5"></i>
-                <span id="btn-text">Kirim Penilaian</span>
-                <svg
-                  id="btn-spinner"
-                  class="hidden spinner w-5 h-5 text-white"
-                  fill="none"
-                  viewbox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  />
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  />
-                </svg>
-              </button>
-            </div>
-          </form>
-        </div>
-        <p class="text-center text-xs text-blue-300/60 mt-6 pb-4">
-          © 2026 Dinas Pertanian, Perikanan, dan Pangan Kabupaten Hulu Sungai
-          Selatan
+        <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white leading-relaxed px-4">
+          SURVEY KEPUASAN PEGAWAI PADA LAYANAN INTERNAL <br class="hidden md:block">
+          DINAS PERTANIAN, PERIKANAN, DAN PANGAN KABUPATEN HSS 2026
+        </h1>
+        <p class="mt-3 text-sm text-blue-300/80">
+          Survey ini bersifat anonim. Data digunakan untuk peningkatan kualitas layanan internal.
         </p>
-      </main>
-    </div>
+      </div>
+    </header>
 
-    <script>
-      // === FORM LOGIC ===
+    <!-- Main Content -->
+    <main class="w-full px-4 md:px-6 lg:px-8 pb-12">
+      <div class="mx-auto w-full max-w-4xl md:max-w-5xl lg:max-w-6xl bg-white rounded-2xl shadow-xl overflow-hidden">
+        <form id="survey-form" class="p-5 md:p-8 space-y-10 md:space-y-12" novalidate>
+          
+          <!-- Aspek Pelayanan -->
+          <fieldset class="fade-in fade-in-d2">
+            <legend class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <i data-lucide="clipboard-list" class="w-5 h-5 text-[#1e3a5f]"></i>
+              Aspek Pelayanan
+            </legend>
+            <p class="text-sm text-gray-500 mb-4">Pilih satu aspek pelayanan yang ingin Anda nilai.</p>
+            <div id="aspek-error" class="hidden text-red-600 text-sm mb-2 font-semibold">⚠ Silakan pilih aspek pelayanan.</div>
+            
+            <div class="space-y-3 aspect-radio">
+              <!-- Item Radio -->
+              <div class="radio-group">
+                <input type="radio" name="pelayanan" id="p1" value="Aspek Pelayanan Administrasi Umum Perangkat Daerah" class="sr-only" />
+                <label for="p1" class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300">Aspek Pelayanan Administrasi Umum Perangkat Daerah</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="pelayanan" id="p2" value="Aspek Pelayanan Administrasi Kepegawaian" class="sr-only" />
+                <label for="p2" class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300">Aspek Pelayanan Administrasi Kepegawaian</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="pelayanan" id="p3" value="Aspek Pelayanan Jasa Penunjang Urusan Pemerintah Daerah" class="sr-only" />
+                <label for="p3" class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300">Aspek Pelayanan Jasa Penunjang Urusan Pemerintah Daerah</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="pelayanan" id="p4" value="Aspek Pelayanan Pemeliharaan Barang Milik Daerah" class="sr-only" />
+                <label for="p4" class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300">Aspek Pelayanan Pemeliharaan Barang Milik Daerah</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="pelayanan" id="p5" value="Aspek Pelayanan Adminstrasi Keuangan" class="sr-only" />
+                <label for="p5" class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300">Aspek Pelayanan Adminstrasi Keuangan</label>
+              </div>
+              <div class="radio-group">
+                <input type="radio" name="pelayanan" id="p6" value="Aspek Pelayanan Perencanaan" class="sr-only" />
+                <label for="p6" class="block cursor-pointer border-2 border-gray-200 rounded-lg px-4 py-3 text-sm font-medium text-gray-700 hover:border-blue-300">Aspek Pelayanan Perencanaan</label>
+              </div>
+            </div>
+          </fieldset>
 
-      const form = document.getElementById('survey-form');
+          <hr class="border-gray-200" />
 
-      const submitBtn = document.getElementById('submit-btn');
+          <!-- Tingkat Kepuasan -->
+          <fieldset class="fade-in fade-in-d3">
+            <legend class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <i data-lucide="smile" class="w-5 h-5 text-[#1e3a5f]"></i>
+              Tingkat Kepuasan
+            </legend>
+            <p class="text-sm text-gray-500 mb-4">Berikan penilaian Anda terhadap pelayanan tersebut.</p>
+            <div id="kepuasan-error" class="hidden text-red-600 text-sm mb-2 font-semibold">⚠ Silakan pilih tingkat kepuasan.</div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 satisfaction-radio">
+              <div>
+                <input type="radio" name="kepuasan" id="k4" value="4" class="sr-only" />
+                <label for="k4" class="sat-4 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-green-400 text-center">
+                  <span class="text-3xl">😀</span>
+                  <span class="text-xs font-bold text-green-700">Sangat Memuaskan</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" name="kepuasan" id="k3" value="3" class="sr-only" />
+                <label for="k3" class="sat-3 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-lime-400 text-center">
+                  <span class="text-3xl">🙂</span>
+                  <span class="text-xs font-bold text-lime-700">Memuaskan</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" name="kepuasan" id="k2" value="2" class="sr-only" />
+                <label for="k2" class="sat-2 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-yellow-400 text-center">
+                  <span class="text-3xl">😐</span>
+                  <span class="text-xs font-bold text-yellow-700">Cukup Memuaskan</span>
+                </label>
+              </div>
+              <div>
+                <input type="radio" name="kepuasan" id="k1" value="1" class="sr-only" />
+                <label for="k1" class="sat-1 cursor-pointer border-2 border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:border-red-400 text-center">
+                  <span class="text-3xl">☹️</span>
+                  <span class="text-xs font-bold text-red-600">Kurang Memuaskan</span>
+                </label>
+              </div>
+            </div>
+          </fieldset>
 
-      const btnText = document.getElementById('btn-text');
+          <hr class="border-gray-200" />
 
-      const btnSpinner = document.getElementById('btn-spinner');
+          <!-- Feedback -->
+          <fieldset class="fade-in fade-in-d3">
+            <legend class="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
+              <i data-lucide="message-square" class="w-5 h-5 text-[#1e3a5f]"></i>
+              Saran atau Kritik
+            </legend>
+            <p class="text-sm text-gray-500 mb-4">Bagikan saran atau kritik Anda untuk peningkatan layanan (opsional).</p>
+            <textarea id="feedback" name="feedback" placeholder="Tulis saran atau kritik Anda di sini..." 
+              class="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none" 
+              rows="5" maxlength="500"></textarea>
+            <p class="text-xs text-gray-400 mt-2">Maks 500 karakter</p>
+          </fieldset>
 
-      const aspekError = document.getElementById('aspek-error');
-
-      const kepuasanError = document.getElementById('kepuasan-error');
-
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        // Reset errors
-
-        aspekError.classList.add('hidden');
-
-        kepuasanError.classList.add('hidden');
-
-        // Validasi
-
-        const pelayanan = form.querySelector('input[name="pelayanan"]:checked');
-
-        const kepuasan = form.querySelector('input[name="kepuasan"]:checked');
-
-        let valid = true;
-
-        if (!pelayanan) {
-          aspekError.classList.remove('hidden');
-          valid = false;
-        }
-
-        if (!kepuasan) {
-          kepuasanError.classList.remove('hidden');
-          valid = false;
-        }
-
-        if (!valid) return;
-
-        const feedback = document.getElementById('feedback').value.trim();
-
-        // Jika pilih Cukup (2) atau Kurang (1) dan feedback kosong
-
-        if (
-          (kepuasan.value === '2' || kepuasan.value === '1') &&
-          feedback === ''
-        ) {
-          let isKurang = kepuasan.value === '1';
-
-          Swal.fire({
-            title: isKurang
-              ? 'Anda Memilih Kurang Memuaskan'
-              : 'Anda Memilih Cukup Memuaskan',
-
-            html: `
-
-          <div style="font-size:50px;">
-
-            ${isKurang ? '☹️' : '😐'}
-
+          <!-- Submit Button -->
+          <div class="pt-2">
+            <button type="submit" id="submit-btn" class="w-full py-3.5 rounded-xl font-bold text-white text-base flex items-center justify-center gap-2 transition-all bg-[#1e3a5f] hover:bg-[#2c5282]">
+              <i id="btn-icon" data-lucide="send" class="w-5 h-5"></i>
+              <span id="btn-text">Kirim Penilaian</span>
+              <svg id="btn-spinner" class="hidden spinner w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+            </button>
           </div>
+        </form>
+      </div>
+      
+      <footer class="text-center text-xs text-blue-300/60 mt-6 pb-4">
+        © 2026 Dinas Pertanian, Perikanan, dan Pangan Kabupaten Hulu Sungai Selatan
+      </footer>
+    </main>
+  </div>
 
-          <br>
+  <script>
+    // Config
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxqV9AUSaGuo-13rbAFYdkw0NbGViEL2wJKHmY0ulvNM6xKKKp75eaek4VhLJUt4dUnw/exec';
 
-          Tolong isikan kritik dan saran
+    // Elements
+    const form = document.getElementById('survey-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnIcon = document.getElementById('btn-icon');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const feedbackEl = document.getElementById('feedback');
 
-          <br><br>
+    // Helper: Show SweetAlert
+    const showAlert = (options) => Swal.fire({
+      timer: 3000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+      ...options
+    });
 
-          <b>Mohon maaf dan terima kasih</b>
+    // Form Logic
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-        `,
+      // Reset Error States
+      document.getElementById('aspek-error').classList.add('hidden');
+      document.getElementById('kepuasan-error').classList.add('hidden');
 
-            showConfirmButton: false,
+      const pelayanan = form.querySelector('input[name="pelayanan"]:checked');
+      const kepuasan = form.querySelector('input[name="kepuasan"]:checked');
+      const feedback = feedbackEl.value.trim();
 
-            timer: 3500,
-
-            timerProgressBar: true,
-
-            background: isKurang ? '#fef2f2' : '#fefce8',
-
-            color: isKurang ? '#991b1b' : '#854d0e',
-          });
-
-          setTimeout(() => {
-            const feedbackEl = document.getElementById('feedback');
-
-            feedbackEl.focus();
-
-            feedbackEl.classList.add('border-red-400');
-          }, 100);
-
-          return;
-        }
-
-        // Tampilkan loading
-
-        submitBtn.disabled = true;
-
-        btnText.textContent = 'Mengirim...';
-
-        btnSpinner.classList.remove('hidden');
-
-        submitBtn.querySelector('[data-lucide="send"]').classList.add('hidden');
-
-        // KIRIM DATA KE GOOGLE APPS SCRIPT
-
-        const formData = new URLSearchParams();
-
-        formData.append('Aspek Pelayanan', pelayanan.value);
-
-        formData.append('Tingkat Kepuasan', kepuasan.value);
-
-        formData.append(
-          'Saran atau Kritik',
-          document.getElementById('feedback').value,
-        );
-
-        fetch(
-          'https://script.google.com/macros/s/AKfycbzxqV9AUSaGuo-13rbAFYdkw0NbGViEL2wJKHmY0ulvNM6xKKKp75eaek4VhLJUt4dUnw/exec',
-          {
-            method: 'POST',
-            body: formData,
-          },
-        )
-          .then((res) => res.text())
-          .then((res) => {
-            form.reset();
-            Swal.fire({
-              icon: 'success',
-              title: 'Sukses',
-              html: 'Survey berhasil dikirim<br><b>Terima kasih</b>',
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              background: '#f0fdf4',
-              color: '#166534',
-              position: 'center',
-            });
-            resetButton();
-          })
-          .catch((err) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Gagal',
-              text: 'Terjadi kesalahan, silakan coba lagi',
-              showConfirmButton: false,
-              timer: 3000,
-              background: '#fef2f2',
-              color: '#991b1b',
-              timerProgressBar: true,
-            });
-          });
-      });
-      function resetButton() {
-        submitBtn.disabled = false;
-        btnText.textContent = 'Kirim Penilaian';
-        btnSpinner.classList.add('hidden');
-        submitBtn
-          .querySelector('[data-lucide="send"]')
-          .classList.remove('hidden');
+      // Validation
+      let isValid = true;
+      if (!pelayanan) {
+        document.getElementById('aspek-error').classList.remove('hidden');
+        isValid = false;
       }
-      // Init icons
-      lucide.createIcons();
-      document
-        .getElementById('feedback')
-        .addEventListener('input', function () {
-          this.classList.remove('border-red-400');
+      if (!kepuasan) {
+        document.getElementById('kepuasan-error').classList.remove('hidden');
+        isValid = false;
+      }
+      if (!isValid) return;
+
+      // Special Validation for Neutral/Negative Feedback
+      if ((kepuasan.value === '1' || kepuasan.value === '2') && feedback === '') {
+        const isKurang = kepuasan.value === '1';
+        showAlert({
+          title: isKurang ? 'Kurang Memuaskan' : 'Cukup Memuaskan',
+          html: `<div class="text-5xl mb-4">${isKurang ? '☹️' : '😐'}</div>Mohon isikan kritik dan saran agar kami dapat memperbaiki layanan.`,
+          background: isKurang ? '#fef2f2' : '#fefce8',
+          color: isKurang ? '#991b1b' : '#854d0e',
+          timer: 3500
         });
-    </script>
-  </body>
+        feedbackEl.focus();
+        feedbackEl.classList.add('border-red-400');
+        return;
+      }
+
+      // UI Loading State
+      setLoading(true);
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append('Aspek Pelayanan', pelayanan.value);
+        formData.append('Tingkat Kepuasan', kepuasan.value);
+        formData.append('Saran atau Kritik', feedback);
+
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          form.reset();
+          showAlert({
+            icon: 'success',
+            title: 'Berhasil Terkirim',
+            html: 'Terima kasih atas partisipasi Anda.',
+            background: '#f0fdf4',
+            color: '#166534'
+          });
+        }
+      } catch (error) {
+        showAlert({
+          icon: 'error',
+          title: 'Gagal Mengirim',
+          text: 'Terjadi kesalahan jaringan, silakan coba lagi.',
+          background: '#fef2f2',
+          color: '#991b1b'
+        });
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      btnText.textContent = isLoading ? 'Mengirim...' : 'Kirim Penilaian';
+      btnSpinner.classList.toggle('hidden', !isLoading);
+      btnIcon.classList.toggle('hidden', isLoading);
+    }
+
+    // Input listeners
+    feedbackEl.addEventListener('input', () => feedbackEl.classList.remove('border-red-400'));
+
+    // Initialize Icons
+    lucide.createIcons();
+  </script>
+</body>
 </html>
