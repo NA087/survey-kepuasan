@@ -42,7 +42,7 @@
         <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
-      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">aHasil Survey Kepuasan Pegawai</h1>
+      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
 
       <!-- LOADING AREA -->
       <div id="loading" class="text-center py-20">
@@ -54,14 +54,16 @@
       <div id="data-container" class="hidden">
         
         <!-- Skor Indeks (SKM) -->
-          <div id="skm-box" class="mb-10">
-            <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg flex flex-col items-center justify-center">
-              <div class="text-sm opacity-90 uppercase tracking-widest font-semibold mb-2">Indeks Kepuasan</div>
-              <!-- Tambahkan leading-tight agar spasi antar baris angka tidak terlalu lebar/mepet -->
-              <div id="skm-value" class="text-7xl font-black leading-tight mb-1">0</div>
-              <div id="skm-kategori" class="text-xl font-bold"></div>
-            </div>
+        <div id="skm-box" class="mb-10">
+          <div id="skm-card" class="rounded-2xl p-10 text-center text-white shadow-lg flex flex-col items-center justify-center" style="min-height: 250px;">
+            <div class="text-sm opacity-90 uppercase tracking-widest font-semibold mb-4">Indeks Kepuasan</div>
+            
+            <!-- Perubahan Utama: Gunakan style line-height manual -->
+            <div id="skm-value" class="text-7xl font-black mb-2" style="line-height: 1; display: block;">0</div>
+            
+            <div id="skm-kategori" class="text-xl font-bold mt-2" style="line-height: 1.2;"></div>
           </div>
+        </div>
 
         <!-- Info Total Responden -->
         <div id="total" class="text-center font-bold text-gray-500 mb-8 text-lg"></div>
