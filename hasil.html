@@ -238,7 +238,33 @@ window.onload = muatData;
 
 // === FUNGSI PDF (Letakkan di luar muatData agar tidak tertumpuk) ===
 function downloadPDF() {
-    // ... isi fungsi downloadPDF Anda tetap sama seperti sebelumnya ...
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    const element = document.getElementById('content');
+    const header = document.getElementById('pdf-header');
+    const footer = document.getElementById('pdf-footer');
+    const downloadBtn = document.getElementById('download-area');
+
+    // Persiapan tampilan PDF
+    header.classList.remove('hidden');
+    footer.classList.remove('hidden');
+    downloadBtn.classList.add('hidden'); // Sembunyikan tombol download di dalam PDF
+
+    html2canvas(element, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = doc.getImageProperties(imgData);
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        doc.save("Laporan_SKM_2026.pdf");
+
+        // Kembalikan tampilan web seperti semula
+        header.classList.add('hidden');
+        footer.classList.add('hidden');
+        downloadBtn.classList.remove('hidden');
+    });
 }
 </script>
 </body>
