@@ -12,6 +12,8 @@
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { animation: spin 0.8s linear infinite; height: 40px; width: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; display: inline-block; }
+    /* Transisi halus saat warna berubah */
+    #skm-card { transition: background-color 0.5s ease; }
   </style>
 </head>
 <body class="min-h-screen pb-10" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
@@ -37,16 +39,16 @@
   <div class="max-w-4xl mx-auto p-4 md:p-6" id="content">
     <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-10">
       
-      <!-- Kop Surat -->
       <div id="pdf-header-img" class="hidden mb-6">
         <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
-      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
+      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">aHasil Survey Kepuasan Pegawai</h1>
 
       <!-- Skor Indeks (SKM) -->
       <div id="skm-box" class="hidden mb-10">
-        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg transition-colors duration-500">
+        <!-- Hapus class warna default di sini agar diatur sepenuhnya oleh JS -->
+        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg">
           <div class="text-sm opacity-90 uppercase tracking-widest font-semibold">Indeks Kepuasan</div>
           <div id="skm-value" class="text-7xl font-black my-2">0</div>
           <div id="skm-kategori" class="text-xl font-bold"></div>
@@ -55,24 +57,20 @@
 
       <div id="total" class="text-center font-bold text-gray-500 mb-8 text-lg"></div>
 
-      <!-- Loading State -->
       <div id="loading" class="text-center py-20">
         <div class="spinner mb-4"></div>
         <p class="text-blue-900 font-medium animate-pulse">Mengambil data...</p>
       </div>
 
-      <!-- Container Hasil Aspek -->
       <div id="result" class="space-y-5 hidden"></div>
 
-      <!-- Footer Khusus PDF -->
       <div id="pdf-footer" class="hidden mt-16 grid grid-cols-2 gap-4 text-center text-sm pt-10">
         <div>Mengetahui,<br><br><br><br><br><b>Kepala Dinas</b></div>
         <div>Kandangan, <span id="current-date"></span><br><br><br><br><br><b>Admin Sistem</b></div>
       </div>
 
-      <!-- Tombol Aksi -->
       <div id="download-area" class="text-center mt-12 hidden">
-        <button onclick="downloadPDF()" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-green-700 hover:scale-105 transition-all mx-auto flex items-center justify-center gap-2">
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-green-700 transition-all mx-auto flex items-center justify-center gap-2">
           📄 Download Laporan PDF
         </button>
       </div>
@@ -98,33 +96,29 @@
           const data = res.responses || [];
           const p = res.penilaian || { total: 0, skm: 0, kategori: "N/A" };
 
-          // Tampilkan Data Utama
-          document.getElementById("total").innerHTML = `Total: ${p.total} Responden`;
+          document.getElementById("total").innerText = `Total: ${p.total} Responden`;
           document.getElementById("skm-value").innerText = Number(p.skm).toFixed(2);
           document.getElementById("skm-kategori").innerText = p.kategori;
 
-          // LOGIKA WARNA KOTAK SKM BERDASARKAN HURUF KATEGORI
           const card = document.getElementById("skm-card");
-          const kat = String(p.kategori).toUpperCase(); 
+          const teksKategori = String(p.kategori).toUpperCase(); 
 
-          // Hapus semua kemungkinan class warna lama agar tidak bentrok
+          // RESET CLASS WARNA (Penting!)
           card.classList.remove("bg-green-600", "bg-blue-600", "bg-yellow-500", "bg-red-600", "bg-gray-500");
 
-          let warnaBaru = "bg-gray-500"; // Default
-          if (kat.includes("A")) {
-            warnaBaru = "bg-green-600";
-          } else if (kat.includes("B")) {
-            warnaBaru = "bg-blue-600";
-          } else if (kat.includes("C")) {
-            warnaBaru = "bg-yellow-500";
-          } else if (kat.includes("D")) {
-            warnaBaru = "bg-red-600";
+          // LOGIKA WARNA YANG LEBIH KUAT
+          if (teksKategori.startsWith("A")) {
+            card.classList.add("bg-green-600");
+          } else if (teksKategori.startsWith("B")) {
+            card.classList.add("bg-blue-600");
+          } else if (teksKategori.startsWith("C")) {
+            card.classList.add("bg-yellow-500");
+          } else if (teksKategori.startsWith("D")) {
+            card.classList.add("bg-red-600");
+          } else {
+            card.classList.add("bg-gray-500");
           }
-          
-          // Terapkan warna baru
-          card.classList.add(warnaBaru);
 
-          // Render Grafik Aspek
           let html = "";
           const counts = {};
           data.forEach(row => { 
@@ -147,16 +141,13 @@
           });
 
           document.getElementById("result").innerHTML = html || "<p class='text-center py-10'>Tidak ada data pada periode ini.</p>";
-          
-          // Tampilkan Elemen
           document.getElementById("loading").classList.add("hidden");
           document.getElementById("result").classList.remove("hidden");
           document.getElementById("skm-box").classList.remove("hidden");
           if(data.length > 0) document.getElementById("download-area").classList.remove("hidden");
         })
         .catch(err => {
-          console.error(err);
-          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data. Periksa URL Script Anda.</p>`;
+          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data.</p>`;
         });
     }
 
@@ -166,15 +157,11 @@
       const tempClone = originalContent.cloneNode(true);
       
       Object.assign(tempClone.style, {
-        position: "absolute",
-        left: "-9999px",
-        top: "0",
-        width: originalContent.offsetWidth + "px",
-        background: "white"
+        position: "absolute", left: "-9999px", top: "0",
+        width: originalContent.offsetWidth + "px", background: "white"
       });
 
       document.body.appendChild(tempClone);
-
       const pdfHeader = tempClone.querySelector('#pdf-header-img');
       const pdfFooter = tempClone.querySelector('#pdf-footer');
       const downloadBtn = tempClone.querySelector('#download-area');
@@ -184,24 +171,14 @@
       if (downloadBtn) downloadBtn.remove();
 
       const dateSpan = tempClone.querySelector('#current-date');
-      if (dateSpan) {
-        dateSpan.innerText = new Date().toLocaleDateString('id-ID', { 
-          day: 'numeric', month: 'long', year: 'numeric' 
-        });
-      }
+      if (dateSpan) dateSpan.innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
       setTimeout(() => {
-        html2canvas(tempClone, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          logging: false
-        }).then(canvas => {
+        html2canvas(tempClone, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
           const imgData = canvas.toDataURL('image/png');
           const pdf = new jsPDF('p', 'mm', 'a4');
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
           pdf.save(`Laporan_Survey_${new Date().getTime()}.pdf`);
           document.body.removeChild(tempClone);
