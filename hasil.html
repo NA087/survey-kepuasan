@@ -130,19 +130,23 @@ skmCard.classList.remove("bg-green-600", "bg-blue-600", "bg-yellow-500", "bg-red
 skmCard.classList.add(colorClass);
 document.getElementById("skm-kategori").innerText = kategoriTeks;
   
-  // ANIMASI SKM
-  let current = 0;
-  const target = penilaian.skm;
-  const el = document.getElementById("skm-value");
+// ANIMASI SKM
+let current = 0;
+const target = penilaian.skm;
+const el = document.getElementById("skm-value");
 
-  const interval = setInterval(() => {
-    current += Math.ceil(target / 30);
+const interval = setInterval(() => {
+    // Kecepatan kenaikan angka (bisa disesuaikan)
+    current += target / 30; 
+    
     if (current >= target) {
-      current = target;
-      clearInterval(interval);
+        current = target;
+        clearInterval(interval);
     }
-    el.innerText = current;
-  }, 30);
+    
+    // Gunakan .toFixed(2) agar angka hanya tampil 2 desimal
+    el.innerText = current.toFixed(2); 
+}, 30);
 
   document.getElementById("skm-box").classList.remove("hidden");
 
