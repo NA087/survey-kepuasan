@@ -42,7 +42,7 @@
         <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
-      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
+      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">aHasil Survey Kepuasan Pegawai</h1>
 
       <!-- LOADING AREA -->
       <div id="loading" class="text-center py-20">
@@ -55,13 +55,13 @@
         
         <!-- Skor Indeks (SKM) -->
         <div id="skm-box" class="mb-10">
-          <div id="skm-card" class="rounded-2xl p-10 text-center text-white shadow-lg flex flex-col items-center justify-center" style="min-height: 250px;">
-            <div class="text-sm opacity-90 uppercase tracking-widest font-semibold mb-4">Indeks Kepuasan</div>
+          <div id="skm-card" class="rounded-2xl p-6 text-center text-white shadow-lg flex flex-col items-center justify-center" style="min-height: 200px;">
+            <div class="text-sm opacity-90 uppercase tracking-widest font-semibold mb-1">Indeks Kepuasan</div>
             
             <!-- Perubahan Utama: Gunakan style line-height manual -->
-            <div id="skm-value" class="text-7xl font-black mb-2" style="line-height: 1; display: block;">0</div>
+            <div id="skm-value" class="text-7xl font-black mb-1" style="line-height: 0.9; display: block;">0</div>
             
-            <div id="skm-kategori" class="text-xl font-bold mt-2" style="line-height: 1.2;"></div>
+            <div id="skm-kategori" class="text-xl font-bold mt-1" style="line-height: 1;"></div>
           </div>
         </div>
 
@@ -168,6 +168,19 @@
       });
 
       document.body.appendChild(tempClone);
+      const skmCard = tempClone.querySelector('#skm-card');
+      if (skmCard) {
+        skmCard.style.padding = "20px";
+        skmCard.style.minHeight = "180px";
+      }
+      const skmValue = tempClone.querySelector('#skm-value');
+      if (skmValue) {
+        skmValue.style.lineHeight = "0.9";
+      }
+      const skmKategori = tempClone.querySelector('#skm-kategori');
+      if (skmKategori) {
+        skmKategori.style.marginTop = "4px";
+      }
       const pdfHeader = tempClone.querySelector('#pdf-header-img');
       const pdfFooter = tempClone.querySelector('#pdf-footer');
       const downloadBtn = tempClone.querySelector('#download-area');
@@ -191,7 +204,7 @@
         });
       }, 600); 
     }
-
+  
     window.onload = muatData;
   </script>
 </body>
