@@ -180,7 +180,7 @@
       if (dateSpan) dateSpan.innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
       setTimeout(() => {
-        html2canvas(tempClone, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+        html2canvas(tempClone, { scale: 2, useCORS: true, backgroundColor: "#ffffff", windowWidth: 800 }).then(canvas => {
           const imgData = canvas.toDataURL('image/png');
           const pdf = new jsPDF('p', 'mm', 'a4');
           const pdfWidth = pdf.internal.pageSize.getWidth();
