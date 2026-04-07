@@ -3,269 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="logo-hss.png">
-  <title>Hasil Survey</title>
-
+  <title>Laporan Hasil Survey</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-    @keyframes fadeIn {
-      from {opacity:0; transform:translateY(10px);}
-      to {opacity:1; transform:translateY(0);}
-    }
-    .animate-fadeIn {
-      animation: fadeIn 0.5s ease-out;
-    }
-  </style>
 </head>
-
-<body class="min-h-screen" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
-<!-- Kontainer Utama: Satu Baris -->
-<div class="max-w-4xl mx-auto px-6 pt-8 pb-4 flex flex-wrap items-center justify-between gap-4">
-  <!-- Grup Filter (Kiri) -->
-  <div class="flex items-center gap-2">
-    <select id="filter-bulan" class="p-2 rounded-lg border shadow-sm text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-      <option value="">Semua Bulan</option>
-      <option value="01">Januari</option>
-      <option value="02">Februari</option>
-      <option value="03">Maret</option>
-      <option value="04">April</option>
-      <option value="05">Mei</option>
-      <option value="06">Juni</option>
-      <option value="07">Juli</option>
-      <option value="08">Agustus</option>
-      <option value="09">September</option>
-      <option value="10">Oktober</option>
-      <option value="11">November</option>
-      <option value="12">Desember</option>
-    </select>
-    
-    <select id="filter-tahun" class="p-2 rounded-lg border shadow-sm text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-      <option value="2026">2026</option>
-      <option value="2025">2025</option>
-    </select>
-
-    <button onclick="muatData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
-      🔍 Filter
-    </button>
+<body class="min-h-screen pb-10" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
+  
+  <!-- Header & Filter -->
+  <div class="max-w-4xl mx-auto px-6 pt-8 pb-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <select id="filter-bulan" class="p-2 rounded-lg border text-sm">
+        <option value="">Semua Bulan</option>
+        <option value="01">Januari</option><option value="02">Februari</option><option value="03">Maret</option><option value="04">April</option>
+        <option value="05">Mei</option><option value="06">Juni</option><option value="07">Juli</option><option value="08">Agustus</option>
+        <option value="09">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+      </select>
+      <select id="filter-tahun" class="p-2 rounded-lg border text-sm">
+        <option value="2026">2026</option><option value="2025">2025</option>
+      </select>
+      <button onclick="muatData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold">🔍 Filter</button>
+    </div>
+    <a href="index.html" class="bg-white text-blue-600 border border-blue-600 text-sm font-bold px-4 py-2 rounded-lg">⬅ Kembali</a>
   </div>
 
-  <!-- Tombol Kembali (Kanan) -->
-  <a href="index.html" 
-     class="bg-white text-blue-600 border border-blue-600 text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:bg-blue-50 transition">
-    ⬅ Kembali ke Survey
-  </a>
+  <!-- Konten Laporan -->
+  <div class="max-w-4xl mx-auto p-6" id="content">
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <div id="pdf-header" class="hidden mb-6 text-center border-b-2 pb-4">
+        <h2 class="font-bold uppercase">Laporan Kepuasan Internal</h2>
+        <p>Dinas Pertanian, Perikanan, dan Pangan HSS</p>
+      </div>
 
-</div>
-<div class="max-w-4xl mx-auto p-6" id="content">
+      <h1 class="text-2xl font-bold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
 
-  <div class="bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
-<!-- Pada bagian KOP DINAS -->
-<div id="pdf-header" class="hidden mb-6 pb-2 text-center">
-  <img src="kop-dinas.PNG" alt="Kop Dinas" class="inline-block" style="width: 100%; max-height: 150px; object-fit: contain;">
-</div>
-    
-    <h1 class="text-2xl font-bold text-center mb-6">
-      Hasil Survey Kepuasan Pegawai Tahun 2026
-    </h1>
+      <div id="skm-box" class="hidden mb-8">
+        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg bg-blue-600">
+          <div class="text-sm opacity-90 uppercase tracking-widest">Indeks Kepuasan</div>
+          <div id="skm-value" class="text-6xl font-bold my-2">0</div>
+          <div id="skm-kategori" class="text-xl font-semibold"></div>
+        </div>
+      </div>
 
-    <!-- SKM -->
-    <div id="skm-box" class="mb-6 hidden">
-      <div id="skm-card" class="rounded-2xl p-6 text-center text-white shadow-lg">
-        <div class="text-sm opacity-80">Nilai SKM</div>
-        <div id="skm-value" class="text-5xl font-bold mt-2">0</div>
-        <div id="skm-kategori" class="text-lg font-semibold mt-2"></div>
+      <div id="total" class="text-center font-bold text-gray-600 mb-8"></div>
+
+      <div id="loading" class="text-center py-10">
+        <p class="animate-pulse">Sedang mengambil data...</p>
+      </div>
+
+      <div id="result" class="space-y-4 hidden"></div>
+
+      <div id="pdf-footer" class="hidden mt-12 grid grid-cols-2 gap-4 text-center text-xs pt-10 border-t">
+        <div>Mengetahui,<br><br><br><br><b>Kepala Dinas</b></div>
+        <div>Kandangan, 2026<br><br><br><br><b>Admin Sistem</b></div>
+      </div>
+
+      <div id="download-area" class="text-center mt-10 hidden">
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:bg-green-700">📄 Download Laporan PDF</button>
       </div>
     </div>
-
-    <!-- TOTAL -->
-    <div id="total" class="text-center mb-6 text-gray-600"></div>
-
-    <!-- Loading -->
-    <div id="loading" class="text-center py-10">
-      <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent mx-auto mb-3"></div>
-      <p class="text-gray-500">Memuat data...</p>
-    </div>
-
-    <!-- LIST -->
-    <div id="result" class="space-y-4 hidden"></div>
-<!-- TANDA TANGAN (Hanya untuk PDF) -->
-    <div id="pdf-footer" class="hidden mt-12 grid grid-cols-2 gap-8 text-center text-sm text-black">
-      <div>
-        <p class="font-semibold">Jabatan Penandatangan 1</p>
-        <div class="h-20"></div> <!-- Ruang kosong untuk TTD manual -->
-        <p class="font-bold underline">NAMA PENANDATANGAN 1</p>
-        <p>NIP. 198XXXXXXXXXXXXXXX</p>
-      </div>
-      <div>
-        <p class="font-semibold">Jabatan Penandatangan 2</p>
-        <div class="h-20"></div>
-        <p class="font-bold underline">NAMA PENANDATANGAN 2</p>
-        <p>NIP. 197XXXXXXXXXXXXXXX</p>
-      </div>
-    </div>
-<!-- PDF -->
-<div id="download-area" class="text-center mt-8 hidden"> <!-- Tambahkan id dan class hidden -->
-  <button onclick="downloadPDF()" 
-    class="bg-green-600 text-white px-5 py-3 rounded-lg shadow hover:bg-green-700">
-    📄 Download PDF
-  </button>
-</div>
-
   </div>
-</div>
 
-<p class="text-center text-xs text-blue-300/60 mt-6 pb-4">
-© 2026 Dinas Pertanian, Perikanan, dan Pangan Kabupaten Hulu Sungai Selatan
-</p>
+  <script>
+    const API_URL = "ISI_URL_WEB_APP_ANDA_DISINI";
 
-<script>
+    function muatData() {
+      document.getElementById("loading").classList.remove("hidden");
+      document.getElementById("result").classList.add("hidden");
+      document.getElementById("skm-box").classList.add("hidden");
+      document.getElementById("download-area").classList.add("hidden");
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzxqV9AUSaGuo-13rbAFYdkw0NbGViEL2wJKHmY0ulvNM6xKKKp75eaek4VhLJUt4dUnw/exec";
+      const bln = document.getElementById("filter-bulan").value;
+      const thn = document.getElementById("filter-tahun").value;
+      const FINAL_URL = `${API_URL}?bulan=${bln}&tahun=${thn}`;
 
-// Fungsi utama untuk mengambil data
-function muatData() {
-    // Tampilkan loading dan sembunyikan hasil saat memproses
-    document.getElementById("loading").classList.remove("hidden");
-    document.getElementById("result").classList.add("hidden");
-    document.getElementById("skm-box").classList.add("hidden");
-    document.getElementById("download-area").classList.add("hidden");
-
-    // Ambil nilai dari dropdown filter
-    const bln = document.getElementById("filter-bulan").value;
-    const thn = document.getElementById("filter-tahun").value;
-    
-    // Gabungkan URL dengan parameter filter
-    const FINAL_URL = `${API_URL}?bulan=${bln}&tahun=${thn}`;
-
-    fetch(FINAL_URL)
-    .then(res => res.json())
-    .then(res => {
+      fetch(FINAL_URL).then(res => res.json()).then(res => {
         const data = res.responses;
-        const penilaian = res.penilaian;
+        const p = res.penilaian;
 
-        // TOTAL
-        document.getElementById("total").innerHTML =
-            `Total Responden: <b>${penilaian.total}</b>`;
+        document.getElementById("total").innerHTML = `Total Responden: ${p.total}`;
+        document.getElementById("skm-value").innerText = p.skm.toFixed(2);
+        document.getElementById("skm-kategori").innerText = p.kategori;
 
-        // WARNA SKM DINAMIS
-        const kategoriTeks = penilaian.kategori;
-        let colorClass = "bg-blue-600";
+        const card = document.getElementById("skm-card");
+        card.className = "rounded-2xl p-8 text-center text-white shadow-lg " + 
+          (p.skm >= 80 ? "bg-green-600" : p.skm >= 70 ? "bg-blue-600" : "bg-red-600");
 
-        if (kategoriTeks.startsWith("A")) colorClass = "bg-green-600";
-        else if (kategoriTeks.startsWith("B")) colorClass = "bg-blue-600";
-        else if (kategoriTeks.startsWith("C")) colorClass = "bg-yellow-500";
-        else if (kategoriTeks.startsWith("D")) colorClass = "bg-red-600";
-
-        const skmCard = document.getElementById("skm-card");
-        skmCard.classList.remove("bg-green-600", "bg-blue-600", "bg-yellow-500", "bg-red-600");
-        skmCard.classList.add(colorClass);
-        document.getElementById("skm-kategori").innerText = kategoriTeks;
-          
-        // ANIMASI SKM
-        let current = 0;
-        const target = penilaian.skm;
-        const el = document.getElementById("skm-value");
-        el.innerText = "0"; // Reset angka sebelum animasi
-
-        const interval = setInterval(() => {
-            current += target / 15; 
-            if (current >= target) {
-                current = target;
-                clearInterval(interval);
-            }
-            el.innerText = current.toFixed(2); 
-        }, 30);
-
-        document.getElementById("skm-box").classList.remove("hidden");
-
-        // HITUNG DATA LIST (ASPEK)
+        let html = "";
         const counts = {};
-        data.forEach(row => {
-            const aspek = row["Aspek Pelayanan"];
-            if (aspek) {
-                if (!counts[aspek]) counts[aspek] = 0;
-                counts[aspek]++;
-            }
+        data.forEach(row => { counts[row["Aspek Pelayanan"]] = (counts[row["Aspek Pelayanan"]] || 0) + 1; });
+
+        Object.keys(counts).forEach(aspek => {
+          const persen = ((counts[aspek] / data.length) * 100).toFixed(1);
+          html += `<div class="bg-gray-50 p-4 rounded-lg border">
+            <div class="flex justify-between font-bold text-sm mb-2"><span>${aspek}</span><span>${counts[aspek]} Responden</span></div>
+            <div class="w-full bg-gray-200 h-2 rounded-full"><div class="bg-blue-500 h-2 rounded-full" style="width:${persen}%"></div></div>
+          </div>`;
         });
 
-        const totalResp = data.length;
-        let resultArr = Object.keys(counts).map(key => ({
-            nama: key,
-            jumlah: counts[key],
-            persen: totalResp > 0 ? ((counts[key] / totalResp) * 100).toFixed(1) : 0
-        }));
-
-        resultArr.sort((a, b) => b.jumlah - a.jumlah);
-
-        // RENDER LIST
-        let html = "";
-        if (totalResp === 0) {
-            html = "<p class='text-center text-gray-500 py-10'>Tidak ada data pada periode ini.</p>";
-        } else {
-            resultArr.forEach((item, index) => {
-                let rank = ["🥇","🥈","🥉"][index] || "";
-                html += `
-                  <div class="bg-gray-50 p-4 rounded-xl border">
-                    <div class="flex justify-between mb-2">
-                      <div class="font-semibold text-sm md:text-base">${rank} ${item.nama}</div>
-                      <div class="text-xs md:text-sm">${item.jumlah} responden (${item.persen}%)</div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-3">
-                      <div class="bg-blue-600 h-3 rounded-full" style="width:${item.persen}%"></div>
-                    </div>
-                  </div>`;
-            });
-        }
-
-        document.getElementById("result").innerHTML = html;
+        document.getElementById("result").innerHTML = html || "<p class='text-center'>Tidak ada data.</p>";
         document.getElementById("loading").classList.add("hidden");
         document.getElementById("result").classList.remove("hidden");
+        document.getElementById("skm-box").classList.remove("hidden");
         document.getElementById("download-area").classList.remove("hidden");
+      });
+    }
 
-    })
-    .catch((err) => {
-        console.error(err);
-        document.getElementById("loading").innerHTML =
-            "<p class='text-red-500'>Gagal mengambil data. Pastikan koneksi stabil.</p>";
-    });
-}
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4');
+      document.getElementById('pdf-header').classList.remove('hidden');
+      document.getElementById('pdf-footer').classList.remove('hidden');
+      document.getElementById('download-area').classList.add('hidden');
 
-// Panggil fungsi muatData pertama kali saat halaman dibuka
-window.onload = muatData;
+      html2canvas(document.getElementById('content')).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        doc.addImage(img, 'PNG', 0, 0, 210, (canvas.height * 210) / canvas.width);
+        doc.save("Laporan_Survey.pdf");
+        document.getElementById('pdf-header').classList.add('hidden');
+        document.getElementById('pdf-footer').classList.add('hidden');
+        document.getElementById('download-area').classList.remove('hidden');
+      });
+    }
 
-// === FUNGSI PDF (Letakkan di luar muatData agar tidak tertumpuk) ===
-function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
-    
-    const element = document.getElementById('content');
-    const header = document.getElementById('pdf-header');
-    const footer = document.getElementById('pdf-footer');
-    const downloadBtn = document.getElementById('download-area');
-
-    // Persiapan tampilan PDF
-    header.classList.remove('hidden');
-    footer.classList.remove('hidden');
-    downloadBtn.classList.add('hidden'); // Sembunyikan tombol download di dalam PDF
-
-    html2canvas(element, { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = doc.getImageProperties(imgData);
-        const pdfWidth = doc.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        doc.save("Laporan_SKM_2026.pdf");
-
-        // Kembalikan tampilan web seperti semula
-        header.classList.add('hidden');
-        footer.classList.add('hidden');
-        downloadBtn.classList.remove('hidden');
-    });
-}
-</script>
+    window.onload = muatData;
+  </script>
 </body>
 </html>
