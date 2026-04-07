@@ -42,12 +42,11 @@
         <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto">
       </div>
 
-      <!-- Perbaikan Typo di sini -->
-      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">aHasil Survey Kepuasan Pegawai</h1>
+      <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
 
       <!-- Skor Indeks (SKM) -->
       <div id="skm-box" class="hidden mb-10">
-        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg">
+        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg transition-colors duration-500">
           <div class="text-sm opacity-90 uppercase tracking-widest font-semibold">Indeks Kepuasan</div>
           <div id="skm-value" class="text-7xl font-black my-2">0</div>
           <div id="skm-kategori" class="text-xl font-bold"></div>
@@ -62,7 +61,7 @@
         <p class="text-blue-900 font-medium animate-pulse">Mengambil data...</p>
       </div>
 
-      <!-- Container Hasil -->
+      <!-- Container Hasil Aspek -->
       <div id="result" class="space-y-5 hidden"></div>
 
       <!-- Footer Khusus PDF -->
@@ -99,29 +98,33 @@
           const data = res.responses || [];
           const p = res.penilaian || { total: 0, skm: 0, kategori: "N/A" };
 
-          // Menampilkan data langsung dari penilaian Excel
+          // Tampilkan Data Utama
           document.getElementById("total").innerHTML = `Total: ${p.total} Responden`;
           document.getElementById("skm-value").innerText = Number(p.skm).toFixed(2);
           document.getElementById("skm-kategori").innerText = p.kategori;
 
+          // LOGIKA WARNA KOTAK SKM BERDASARKAN HURUF KATEGORI
           const card = document.getElementById("skm-card");
-          const kat = p.kategori.toUpperCase(); // Ambil huruf kategori (A/B/C/D)
+          const kat = String(p.kategori).toUpperCase(); 
 
-          // Logika Warna Berdasarkan Huruf Kategori
-          let warnaClass = "bg-gray-500"; // Warna default jika tidak terdeteksi
+          // Hapus semua kemungkinan class warna lama agar tidak bentrok
+          card.classList.remove("bg-green-600", "bg-blue-600", "bg-yellow-500", "bg-red-600", "bg-gray-500");
 
+          let warnaBaru = "bg-gray-500"; // Default
           if (kat.includes("A")) {
-            warnaClass = "bg-green-600"; // A = Hijau
+            warnaBaru = "bg-green-600";
           } else if (kat.includes("B")) {
-            warnaClass = "bg-blue-600";  // B = Biru
+            warnaBaru = "bg-blue-600";
           } else if (kat.includes("C")) {
-            warnaClass = "bg-yellow-500"; // C = Kuning
+            warnaBaru = "bg-yellow-500";
           } else if (kat.includes("D")) {
-            warnaClass = "bg-red-600";    // D = Merah
+            warnaBaru = "bg-red-600";
           }
+          
+          // Terapkan warna baru
+          card.classList.add(warnaBaru);
 
-          card.className = `rounded-2xl p-8 text-center text-white shadow-lg ${warnaClass}`;
-
+          // Render Grafik Aspek
           let html = "";
           const counts = {};
           data.forEach(row => { 
@@ -144,13 +147,16 @@
           });
 
           document.getElementById("result").innerHTML = html || "<p class='text-center py-10'>Tidak ada data pada periode ini.</p>";
+          
+          // Tampilkan Elemen
           document.getElementById("loading").classList.add("hidden");
           document.getElementById("result").classList.remove("hidden");
           document.getElementById("skm-box").classList.remove("hidden");
           if(data.length > 0) document.getElementById("download-area").classList.remove("hidden");
         })
         .catch(err => {
-          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data. Periksa koneksi atau URL Script.</p>`;
+          console.error(err);
+          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data. Periksa URL Script Anda.</p>`;
         });
     }
 
