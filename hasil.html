@@ -22,39 +22,43 @@
 </head>
 
 <body class="min-h-screen" style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);">
-
-<!-- Tombol kembali -->
-  <div class="max-w-4xl mx-auto px-6 mb-4 flex gap-4">
-  <select id="filter-bulan" class="p-2 rounded-lg border shadow-sm text-sm">
-<option value="">Semua Bulan</option>
-  <option value="01">Januari</option>
-  <option value="02">Februari</option>
-  <option value="03">Maret</option>
-  <option value="04">April</option>
-  <option value="05">Mei</option>
-  <option value="06">Juni</option>
-  <option value="07">Juli</option>
-  <option value="08">Agustus</option>
-  <option value="09">September</option>
-  <option value="10">Oktober</option>
-  <option value="11">November</option>
-  <option value="12">Desember</option>
-  </select>
+<!-- Kontainer Utama: Satu Baris -->
+<div class="max-w-4xl mx-auto px-6 mb-6 flex flex-wrap items-center justify-between gap-4">
   
-  <select id="filter-tahun" class="p-2 rounded-lg border shadow-sm text-sm">
-    <option value="2026">2026</option>
-    <option value="2025">2025</option>
-  </select>
+  <!-- Grup Filter (Kiri) -->
+  <div class="flex items-center gap-2">
+    <select id="filter-bulan" class="p-2 rounded-lg border shadow-sm text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+      <option value="">Semua Bulan</option>
+      <option value="01">Januari</option>
+      <option value="02">Februari</option>
+      <option value="03">Maret</option>
+      <option value="04">April</option>
+      <option value="05">Mei</option>
+      <option value="06">Juni</option>
+      <option value="07">Juli</option>
+      <option value="08">Agustus</option>
+      <option value="09">September</option>
+      <option value="10">Oktober</option>
+      <option value="11">November</option>
+      <option value="12">Desember</option>
+    </select>
+    
+    <select id="filter-tahun" class="p-2 rounded-lg border shadow-sm text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+      <option value="2026">2026</option>
+      <option value="2025">2025</option>
+    </select>
 
-  <button onclick="muatData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700">
-    🔍 Filter
-  </button>
-</div>
-  <div class="w-full flex justify-end p-4">
+    <button onclick="muatData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-sm">
+      🔍 Filter
+    </button>
+  </div>
+
+  <!-- Tombol Kembali (Kanan) -->
   <a href="index.html" 
-     class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+     class="bg-white text-blue-600 border border-blue-600 text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:bg-blue-50 transition">
     ⬅ Kembali ke Survey
   </a>
+
 </div>
 <div class="max-w-4xl mx-auto p-6" id="content">
 
