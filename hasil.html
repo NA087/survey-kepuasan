@@ -12,7 +12,6 @@
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { animation: spin 0.8s linear infinite; height: 40px; width: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3b82f6; border-radius: 50%; display: inline-block; }
-    /* Transisi halus saat warna berubah */
     #skm-card { transition: background-color 0.5s ease; }
   </style>
 </head>
@@ -45,24 +44,31 @@
 
       <h1 class="text-2xl font-extrabold text-center mb-8 text-gray-800">Hasil Survey Kepuasan Pegawai</h1>
 
-      <!-- Skor Indeks (SKM) -->
-      <div id="skm-box" class="hidden mb-10">
-        <!-- Hapus class warna default di sini agar diatur sepenuhnya oleh JS -->
-        <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg">
-          <div class="text-sm opacity-90 uppercase tracking-widest font-semibold">Indeks Kepuasan</div>
-          <div id="skm-value" class="text-7xl font-black my-2">0</div>
-          <div id="skm-kategori" class="text-xl font-bold"></div>
-        </div>
-      </div>
-
-      <div id="total" class="text-center font-bold text-gray-500 mb-8 text-lg"></div>
-
+      <!-- LOADING AREA -->
       <div id="loading" class="text-center py-20">
         <div class="spinner mb-4"></div>
         <p class="text-blue-900 font-medium animate-pulse">Mengambil data...</p>
       </div>
 
-      <div id="result" class="space-y-5 hidden"></div>
+      <!-- KONTEN INDUK (Semua hasil masuk sini agar bisa disembunyikan sekaligus) -->
+      <div id="data-container" class="hidden">
+        
+        <!-- Skor Indeks (SKM) -->
+        <div id="skm-box" class="mb-10">
+          <div id="skm-card" class="rounded-2xl p-8 text-center text-white shadow-lg">
+            <div class="text-sm opacity-90 uppercase tracking-widest font-semibold">Indeks Kepuasan</div>
+            <div id="skm-value" class="text-7xl font-black my-2">0</div>
+            <div id="skm-kategori" class="text-xl font-bold"></div>
+          </div>
+        </div>
+
+        <!-- Info Total Responden -->
+        <div id="total" class="text-center font-bold text-gray-500 mb-8 text-lg"></div>
+
+        <!-- Grafik Aspek Pelayanan -->
+        <div id="result" class="space-y-5"></div>
+
+      </div> <!-- END DATA CONTAINER -->
 
       <div id="pdf-footer" class="hidden mt-16 grid grid-cols-2 gap-4 text-center text-sm pt-10">
         <div>Mengetahui,<br><br><br><br><br><b>Kepala Dinas</b></div>
@@ -81,9 +87,9 @@
     const API_BASE_URL = "https://script.google.com/macros/s/AKfycbwMCYLpYqQjD1o9SoIA0L9Xgi5C9uwQMC54UDIFKlSveIWSne7KD_P9AYwVK1sQShmrNQ/exec";
 
     function muatData() {
+      // 1. Sembunyikan Kontainer Induk & Tampilkan Loading
       document.getElementById("loading").classList.remove("hidden");
-      document.getElementById("result").classList.add("hidden");
-      document.getElementById("skm-box").classList.add("hidden");
+      document.getElementById("data-container").classList.add("hidden");
       document.getElementById("download-area").classList.add("hidden");
 
       const bln = document.getElementById("filter-bulan").value;
@@ -96,29 +102,23 @@
           const data = res.responses || [];
           const p = res.penilaian || { total: 0, skm: 0, kategori: "N/A" };
 
+          // 2. Isi Data ke Elemen
           document.getElementById("total").innerText = `Total: ${p.total} Responden`;
           document.getElementById("skm-value").innerText = Number(p.skm).toFixed(2);
           document.getElementById("skm-kategori").innerText = p.kategori;
 
+          // 3. Atur Warna Kartu SKM
           const card = document.getElementById("skm-card");
           const teksKategori = String(p.kategori).toUpperCase(); 
-
-          // RESET CLASS WARNA (Penting!)
           card.classList.remove("bg-green-600", "bg-blue-600", "bg-yellow-500", "bg-red-600", "bg-gray-500");
 
-          // LOGIKA WARNA YANG LEBIH KUAT
-          if (teksKategori.startsWith("A")) {
-            card.classList.add("bg-green-600");
-          } else if (teksKategori.startsWith("B")) {
-            card.classList.add("bg-blue-600");
-          } else if (teksKategori.startsWith("C")) {
-            card.classList.add("bg-yellow-500");
-          } else if (teksKategori.startsWith("D")) {
-            card.classList.add("bg-red-600");
-          } else {
-            card.classList.add("bg-gray-500");
-          }
+          if (teksKategori.startsWith("A")) card.classList.add("bg-green-600");
+          else if (teksKategori.startsWith("B")) card.classList.add("bg-blue-600");
+          else if (teksKategori.startsWith("C")) card.classList.add("bg-yellow-500");
+          else if (teksKategori.startsWith("D")) card.classList.add("bg-red-600");
+          else card.classList.add("bg-gray-500");
 
+          // 4. Bangun Grafik Batang
           let html = "";
           const counts = {};
           data.forEach(row => { 
@@ -140,14 +140,17 @@
               </div>`;
           });
 
-          document.getElementById("result").innerHTML = html || "<p class='text-center py-10'>Tidak ada data pada periode ini.</p>";
+          document.getElementById("result").innerHTML = html || "<p class='text-center py-10 text-gray-400'>Tidak ada data pada periode ini.</p>";
+
+          // 5. Tampilkan Kembali Kontainer Induk & Sembunyikan Loading
           document.getElementById("loading").classList.add("hidden");
-          document.getElementById("result").classList.remove("hidden");
-          document.getElementById("skm-box").classList.remove("hidden");
-          if(data.length > 0) document.getElementById("download-area").classList.remove("hidden");
+          document.getElementById("data-container").classList.remove("hidden");
+          
+          // Tampilkan tombol download hanya jika ada data
+          if(p.total > 0) document.getElementById("download-area").classList.remove("hidden");
         })
         .catch(err => {
-          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data.</p>`;
+          document.getElementById("loading").innerHTML = `<p class="text-red-500">Gagal memuat data. Periksa koneksi internet.</p>`;
         });
     }
 
