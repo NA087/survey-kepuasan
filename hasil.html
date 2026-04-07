@@ -139,42 +139,62 @@
     }
 
     function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const content = document.getElementById('content');
-      const pdfHeader = document.getElementById('pdf-header-img');
-      const pdfFooter = document.getElementById('pdf-footer');
-      const downloadBtnArea = document.getElementById('download-area');
+  const { jsPDF } = window.jspdf;
+  const originalContent = document.getElementById('content');
+  
+  // 1. Buat "Clone" atau salinan elemen agar tidak mengganggu tampilan asli
+  const tempClone = originalContent.cloneNode(true);
+  
+  // 2. Beri gaya pada salinan agar berada di luar layar (rahasia)
+  Object.assign(tempClone.style, {
+    position: "absolute",
+    left: "-9999px",
+    top: "0",
+    width: originalContent.offsetWidth + "px",
+    background: "white"
+  });
 
-      // Tampilkan Kop dan Footer
-      pdfHeader.classList.remove('hidden');
-      pdfFooter.classList.remove('hidden');
-      downloadBtnArea.classList.add('hidden');
-      
-      document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', { 
-        day: 'numeric', month: 'long', year: 'numeric' 
-      });
+  // Tempelkan salinan ke body secara sembunyi
+  document.body.appendChild(tempClone);
 
-      setTimeout(() => {
-        html2canvas(content, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: "#ffffff"
-        }).then(canvas => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  // 3. Di dalam salinan, tampilkan Kop dan Footer (tapi tetap tidak terlihat user)
+  const pdfHeader = tempClone.querySelector('#pdf-header-img');
+  const pdfFooter = tempClone.querySelector('#pdf-footer');
+  const downloadBtn = tempClone.querySelector('#download-area');
 
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          pdf.save(`Laporan_Survey_${new Date().getTime()}.pdf`);
+  if (pdfHeader) pdfHeader.classList.remove('hidden');
+  if (pdfFooter) pdfFooter.classList.remove('hidden');
+  if (downloadBtn) downloadBtn.remove(); // Hapus tombol di PDF
 
-          // Sembunyikan kembali setelah download
-          pdfHeader.classList.add('hidden');
-          pdfFooter.classList.add('hidden');
-          downloadBtnArea.classList.remove('hidden');
-        });
-      }, 500); 
-    }
+  // Set tanggal di salinan
+  const dateSpan = tempClone.querySelector('#current-date');
+  if (dateSpan) {
+    dateSpan.innerText = new Date().toLocaleDateString('id-ID', { 
+      day: 'numeric', month: 'long', year: 'numeric' 
+    });
+  }
+
+  // 4. Potret salinan rahasia tersebut
+  setTimeout(() => {
+    html2canvas(tempClone, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      logging: false
+    }).then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Laporan_Survey_${new Date().getTime()}.pdf`);
+
+      // 5. Hapus salinan setelah selesai agar tidak memenuhi memori
+      document.body.removeChild(tempClone);
+    });
+  }, 400); 
+}
 
     window.onload = muatData;
   </script>
