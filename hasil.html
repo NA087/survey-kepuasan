@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="logo-web.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="logo-web.ico" type="image/x-icon" />
+    <title>Laporan Hasil Survey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        animation: spin 0.8s linear infinite;
+        height: 40px;
+        width: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      #skm-card {
+        transition: background-color 0.5s ease;
+      }
+      /* REFERENSI ANIMASI BARU */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-in {
+        animation: fadeIn 0.6s ease-out both;
+      }
+
+      /* Animasi untuk item grafik agar muncul berurutan */
+      .aspek-item {
+        animation: fadeIn 0.5s ease-out both;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen pb-10"
+    style="
+      background: linear-gradient(
+        135deg,
+        #1e3a5f 0%,
+        #2c5282 50%,
+        #1e3a5f 100%
+      );
+    "
+  >
+    <!-- Header & Filter -->
+<div class="max-w-4xl mx-auto px-6 pt-8 pb-4 flex flex-wrap items-center justify-between gap-4 fade-in">
+  <div class="flex items-center gap-3">
+    <!-- Tambahkan onchange="muatData()" di sini -->
+    <select
+      id="filter-bulan"
+      onchange="muatData()"
+      class="p-2 rounded-lg border border-blue-300 text-sm outline-none"
+    >
+      <option value="">Semua Bulan</option>
+      <option value="01">Januari</option>
+      <option value="02">Februari</option>
+      <option value="03">Maret</option>
+      <option value="04">April</option>
+      <option value="05">Mei</option>
+      <option value="06">Juni</option>
+      <option value="07">Juli</option>
+      <option value="08">Agustus</option>
+      <option value="09">September</option>
+      <option value="10">Oktober</option>
+      <option value="11">November</option>
+      <option value="12">Desember</option>
+    </select>
+
+    <!-- Tambahkan onchange="muatData()" di sini -->
+    <select
+      id="filter-tahun"
+      onchange="muatData()"
+      class="p-2 rounded-lg border border-blue-300 text-sm outline-none"
+    >
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+    </select>
+
+    <!-- Tombol Filter dihilangkan karena sudah otomatis -->
+  </div>
+  
+  <a href="index.html" class="bg-white text-blue-600 border border-blue-600 text-sm font-bold px-4 py-2 rounded-lg hover:bg-blue-50">
+    ⬅ Kembali
+  </a>
+</div>
+
+    <!-- Konten Laporan -->
+    <div class="max-w-4xl mx-auto p-4 md:p-6 fade-in" id="content">
+      <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-10">
+        <div id="pdf-header-img" class="hidden mb-2">
+          <img src="kop-dinas.PNG" alt="Kop Dinas" class="w-full h-auto" />
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-center mb-4 text-gray-800">
+          Hasil Survey Kepuasan Pegawai
+        </h1>
+
+        <!-- LOADING AREA -->
+        <div id="loading" class="text-center py-20">
+          <div class="spinner mb-4"></div>
+          <p class="text-blue-900 font-medium animate-pulse">
+            Mengambil data...
+          </p>
+        </div>
+
+        <!-- KONTEN INDUK (Semua hasil masuk sini agar bisa disembunyikan sekaligus) -->
+        <div id="data-container" class="hidden">
+          <!-- Skor Indeks (SKM) -->
+          <div id="skm-box" class="mb-4">
+            <div
+              id="skm-card"
+              class="rounded-2xl p-6 text-center text-white shadow-lg"
+            >
+              <div
+                class="text-sm opacity-90 uppercase tracking-widest font-semibold"
+              >
+                Indeks Kepuasan
+              </div>
+              <div id="skm-value" class="text-7xl font-black my-2">0</div>
+              <div id="skm-kategori" class="text-xl font-bold"></div>
+            </div>
+          </div>
+
+          <!-- Info Total Responden -->
+          <div
+            id="total"
+            class="text-center font-bold text-gray-500 mb-8 text-lg"
+          ></div>
+
+          <!-- Grafik Aspek Pelayanan -->
+          <div id="result" class="space-y-5"></div>
+        </div>
+        <!-- END DATA CONTAINER -->
+
+        <div
+          id="pdf-footer"
+          class="hidden mt-16 grid grid-cols-2 gap-4 text-center text-sm pt-10"
+        >
+          <div>
+            Mengetahui,<br /><br /><br /><br /><br /><b>Kepala Dinas</b>
+          </div>
+          <div>
+            Kandangan, <span id="current-date"></span
+            ><br /><br /><br /><br /><br /><b>Admin Sistem</b>
+          </div>
+        </div>
+
+        <div id="download-area" class="text-center mt-12 hidden">
+          <button
+            onclick="downloadPDF()"
+            class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-green-700 transition-all mx-auto flex items-center justify-center gap-2"
+          >
+            📄 Download Laporan PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL =
+        'https://script.google.com/macros/s/AKfycbwMCYLpYqQjD1o9SoIA0L9Xgi5C9uwQMC54UDIFKlSveIWSne7KD_P9AYwVK1sQShmrNQ/exec';
+      let currentData = [];
+      let currentPenilaian = {};
+
+     function muatData() {
+  // 1. Reset tampilan: Tampilkan Loading & Sembunyikan konten lama
+  const loadingEl = document.getElementById('loading');
+  const containerEl = document.getElementById('data-container');
+  const downloadArea = document.getElementById('download-area');
+
+  loadingEl.classList.remove('hidden');
+  containerEl.classList.add('hidden');
+  downloadArea.classList.add('hidden');
+
+  // 2. Ambil parameter filter
+  const bln = document.getElementById('filter-bulan').value;
+  const thn = document.getElementById('filter-tahun').value;
+  const FINAL_URL = `${API_BASE_URL}?bulan=${bln}&tahun=${thn}`;
+
+  fetch(FINAL_URL)
+    .then((res) => res.json())
+    .then((res) => {
+      const data = res.responses || [];
+      const p = res.penilaian || { total: 0, skm: 0, kategori: 'N/A' };
+
+      // Simpan untuk keperluan PDF
+      currentData = data;
+      currentPenilaian = p;
+
+      // 3. Update Data Statistik & SKM
+      document.getElementById('total').innerText = `Total: ${p.total} Responden`;
+      document.getElementById('skm-value').innerText = Number(p.skm).toFixed(2);
+      document.getElementById('skm-kategori').innerText = p.kategori;
+
+      // 4. Update Warna Kartu SKM
+      const card = document.getElementById('skm-card');
+      const teksKategori = String(p.kategori).toUpperCase();
+      card.className = "rounded-2xl p-6 text-center text-white shadow-lg transition-all duration-500"; // Reset classes
+
+      if (teksKategori.startsWith('A')) card.classList.add('bg-green-600');
+      else if (teksKategori.startsWith('B')) card.classList.add('bg-blue-600');
+      else if (teksKategori.startsWith('C')) card.classList.add('bg-yellow-500');
+      else if (teksKategori.startsWith('D')) card.classList.add('bg-red-600');
+      else card.classList.add('bg-gray-500');
+
+      // 5. Bangun Grafik Batang
+      let html = '';
+      const counts = {};
+      data.forEach((row) => {
+        const key = row['Aspek Pelayanan'];
+        if (key) counts[key] = (counts[key] || 0) + 1;
+      });
+
+      Object.keys(counts).forEach((aspek) => {
+        const persen = data.length > 0 ? ((counts[aspek] / data.length) * 100).toFixed(1) : 0;
+        html += `
+          <div class="bg-gray-50 p-5 rounded-xl border border-gray-200">
+            <div class="flex justify-between font-bold text-gray-700 text-sm mb-3">
+              <span>${aspek}</span>
+              <span class="text-blue-600">${counts[aspek]} Pegawai</span>
+            </div>
+            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full rounded-full transition-all duration-1000" style="width:${persen}%"></div>
+            </div>
+          </div>`;
+      });
+
+      document.getElementById('result').innerHTML = html || "<p class='text-center py-10 text-gray-400'>Tidak ada data pada periode ini.</p>";
+// Mengisi tanggal otomatis untuk footer laporan
+const opsiTanggal = { day: 'numeric', month: 'long', year: 'numeric' };
+document.getElementById('current-date').innerText = new Date().toLocaleDateString('id-ID', opsiTanggal);
+      // 6. FINISHING: Sembunyikan Loading & Jalankan Animasi Muncul
+      loadingEl.classList.add('hidden');
+      containerEl.classList.remove('hidden');
+      
+      // Trigger animasi fade-in ulang
+      containerEl.classList.remove('fade-in');
+      void containerEl.offsetWidth; 
+      containerEl.classList.add('fade-in');
+
+      // Munculkan tombol download jika ada data
+      if (p.total > 0) downloadArea.classList.remove('hidden');
+    })
+    .catch((err) => {
+      loadingEl.innerHTML = `<p class="text-red-500 font-bold">⚠️ Gagal memuat data. Periksa koneksi atau API.</p>`;
+      console.error("Fetch Error:", err);
+    });
+}
+      function downloadPDF() {
+        // Buat form dan submit ke K_pdf.php dengan POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'K_pdf.php';
+
+        // Tambahkan bulan
+        const bulanInput = document.createElement('input');
+        bulanInput.type = 'hidden';
+        bulanInput.name = 'bulan';
+        bulanInput.value = document.getElementById('filter-bulan').value;
+        form.appendChild(bulanInput);
+
+        // Tambahkan tahun
+        const tahunInput = document.createElement('input');
+        tahunInput.type = 'hidden';
+        tahunInput.name = 'tahun';
+        tahunInput.value = document.getElementById('filter-tahun').value;
+        form.appendChild(tahunInput);
+
+        // Tambahkan data
+        const dataInput = document.createElement('input');
+        dataInput.type = 'hidden';
+        dataInput.name = 'data';
+        dataInput.value = JSON.stringify(currentData);
+        form.appendChild(dataInput);
+
+        // Tambahkan penilaian
+        const penilaianInput = document.createElement('input');
+        penilaianInput.type = 'hidden';
+        penilaianInput.name = 'penilaian';
+        penilaianInput.value = JSON.stringify(currentPenilaian);
+        form.appendChild(penilaianInput);
+
+        // Submit form
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+      }
+
+      window.onload = muatData;
+    </script>
+  </body>
+</html>
